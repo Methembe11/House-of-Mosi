@@ -1,0 +1,15 @@
+{
+  "name": "guestflow-os",
+  "version": "1.0.0",
+  "description": "GuestFlow OS - Tourism Operations Platform",
+  "private": true,
+  "scripts": {
+    "server": "node server/index.js",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd client && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
