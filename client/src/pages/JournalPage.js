@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { journalArticles } from '../data/data';
+import { journalArticles, guides } from '../data/data';
 
 const PageWrapper = styled.div`padding-top: 90px;`;
 
@@ -112,11 +112,36 @@ export default function JournalPage() {
   return (
     <PageWrapper>
       <HeroSection>
-        <HeroTitle>The Mosi Journal</HeroTitle>
+        <HeroTitle>Guides & Stories</HeroTitle>
         <HeroSub>Stories, guides, and insights from the heart of Victoria Falls</HeroSub>
       </HeroSection>
 
       <Content>
+        {/* Travel Guides Section */}
+        <SectionLabel style={{ marginBottom: '1rem' }}>Travel Guides</SectionLabel>
+        <SectionTitle style={{ marginBottom: '2rem' }}>Plan Your Perfect Trip</SectionTitle>
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+          <ArticlesGrid>
+            {guides.map(guide => (
+              <motion.div key={guide.id} variants={fadeUp}>
+                <ArticleCard to={`/journal/${guide.slug}`}>
+                  <ArticleImg><img src={guide.image} alt={guide.title} loading="lazy" /></ArticleImg>
+                  <CardBody>
+                    <Cat>{guide.category}</Cat>
+                    <CardTitle>{guide.title}</CardTitle>
+                    <CardExcerpt>{guide.excerpt}</CardExcerpt>
+                    <CardMeta><span>{guide.readTime}</span></CardMeta>
+                  </CardBody>
+                </ArticleCard>
+              </motion.div>
+            ))}
+          </ArticlesGrid>
+        </motion.div>
+
+        {/* Articles Section */}
+        <div style={{ marginTop: '4rem' }}>
+        <SectionLabel style={{ marginBottom: '1rem' }}>Articles</SectionLabel>
+        <SectionTitle style={{ marginBottom: '2rem' }}>Stories & Insights</SectionTitle>
         <FeaturedGrid>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <FeaturedCard to={`/journal/${featured.slug}`}>
@@ -162,7 +187,11 @@ export default function JournalPage() {
             ))}
           </ArticlesGrid>
         </motion.div>
+        </div>
       </Content>
     </PageWrapper>
   );
 }
+
+const SectionLabel = styled.span` font-size: ${p => p.theme.fontSizes.xs}; text-transform: uppercase; letter-spacing: 0.25em; color: ${p => p.theme.colors.cocoa}; font-weight: 500; display: block; `;
+const SectionTitle = styled.h2` font-family: ${p => p.theme.fonts.serif}; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; color: ${p => p.theme.colors.text}; `;

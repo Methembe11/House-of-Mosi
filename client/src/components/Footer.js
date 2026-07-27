@@ -103,20 +103,21 @@ export default function Footer() {
       <FooterInner>
         <FooterGrid>
           <Brand>
-            <h3>House of <span>Mosi</span></h3>
+            <h3>VicFalls <span>One</span></h3>
             <p>
-              The luxury gateway to Victoria Falls. We curate extraordinary
-              journeys across the destination's most magnificent areas.
+              The all-in-one platform for Victoria Falls. We connect
+              travelers with the destination's finest experiences, stays, dining, and transport.
             </p>
           </Brand>
 
           <Column>
             <h4>Explore</h4>
-            <Link to="/stays">Stays</Link>
+            <Link to="/discover">Discover</Link>
             <Link to="/experiences">Experiences</Link>
             <Link to="/dining">Dining</Link>
-            <Link to="/plan">Plan Your Journey</Link>
-            <Link to="/journal">The Journal</Link>
+            <Link to="/transport">Transport</Link>
+            <Link to="/events">Events</Link>
+            <Link to="/plan">Trip Planner</Link>
           </Column>
 
           <Column>
@@ -128,17 +129,18 @@ export default function Footer() {
           </Column>
 
           <Column>
-            <h4>Services</h4>
+            <h4>Platform</h4>
             <Link to="/collection">Your Collection</Link>
-            <Link to="/plan">Plan Your Journey</Link>
-            <Link to="/discover">Discover</Link>
+            <Link to="/plan">Trip Planner</Link>
+            <Link to="/business">Business Portal</Link>
+            <Link to="/dashboard">Tourism Dashboard</Link>
           </Column>
         </FooterGrid>
 
         <Divider />
 
         <Bottom>
-          <p>&copy; 2026 House of Mosi. All rights reserved.</p>
+          <p>&copy; 2026 VicFalls One by House of Mosi. All rights reserved.</p>
           <Regions>
             <span>Zimbabwe</span>
             <span>Zambia</span>

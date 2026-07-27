@@ -213,11 +213,11 @@ const CloseBtn = styled.button`
 
 const NAV_ITEMS = [
   { to: '/discover', label: 'Discover' },
-  { to: '/stays', label: 'Stay' },
   { to: '/experiences', label: 'Experiences' },
   { to: '/dining', label: 'Dining' },
-  { to: '/destinations', label: 'Destinations' },
-  { to: '/journal', label: 'Journal' },
+  { to: '/transport', label: 'Transport' },
+  { to: '/events', label: 'Events' },
+  { to: '/journal', label: 'Guides' },
 ];
 
 function isActive(pathname, to) {
@@ -246,7 +246,7 @@ export default function Navbar({ collectionCount = 0 }) {
       <Nav $scrolled={navScrolled}>
         <NavInner $scrolled={navScrolled}>
           <Logo to="/" $scrolled={navScrolled}>
-            House of <span>Mosi</span>
+            VicFalls <span>One</span>
           </Logo>
 
           <NavLinks>

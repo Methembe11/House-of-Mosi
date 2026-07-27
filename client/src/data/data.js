@@ -1005,3 +1005,215 @@ export const mapLocations = [
   { id: 'map-8', name: 'Victoria Falls Bridge', type: 'attraction', lat: -17.9319, lng: 25.8288, price: 'Free' },
   { id: 'map-9', name: 'Helipad', type: 'airport', lat: -17.8621, lng: 25.8310, price: '' }
 ];
+
+export const transportServices = [
+  {
+    id: 'trans-1',
+    name: 'Airport Transfer',
+    slug: 'airport-transfer',
+    description: 'Direct transfer from Victoria Falls Airport to your hotel or lodge. Air-conditioned vehicles with professional drivers.',
+    route: 'Airport → Hotel',
+    duration: '20 minutes',
+    priceFrom: 35,
+    priceUnit: 'per vehicle',
+    vehicleType: 'Sedan',
+    capacity: '3 passengers',
+    features: ['Air conditioning', 'Meet & greet', 'Flight tracking', 'Child seats available'],
+    available: true,
+    rating: 4.8,
+    reviewCount: 234
+  },
+  {
+    id: 'trans-2',
+    name: 'Hotel Transfer',
+    slug: 'hotel-transfer',
+    description: 'Door-to-door transfer between your hotel and any activity, restaurant, or attraction in Victoria Falls.',
+    route: 'Hotel → Activity',
+    duration: '15 minutes',
+    priceFrom: 25,
+    priceUnit: 'per vehicle',
+    vehicleType: 'Sedan',
+    capacity: '3 passengers',
+    features: ['Air conditioning', 'Flexible scheduling', 'Local knowledge', 'Waiting time included'],
+    available: true,
+    rating: 4.7,
+    reviewCount: 189
+  },
+  {
+    id: 'trans-3',
+    name: 'Private Driver',
+    slug: 'private-driver',
+    description: 'Hire a professional driver for the day. Perfect for exploring Victoria Falls at your own pace with a knowledgeable local guide.',
+    route: 'Hourly booking',
+    duration: '4-8 hours',
+    priceFrom: 50,
+    priceUnit: 'per hour',
+    vehicleType: 'SUV',
+    capacity: '4 passengers',
+    features: ['Full day hire', 'Local guide knowledge', 'Flexible itinerary', 'Fuel included'],
+    available: true,
+    rating: 4.9,
+    reviewCount: 156
+  },
+  {
+    id: 'trans-4',
+    name: 'Shuttle Service',
+    slug: 'shuttle-service',
+    description: 'Affordable shared shuttle service connecting major hotels, the town center, and Victoria Falls attractions.',
+    route: 'Shared routes',
+    duration: '10-30 minutes',
+    priceFrom: 15,
+    priceUnit: 'per person',
+    vehicleType: 'Minibus',
+    capacity: '14 passengers',
+    features: ['Fixed routes', 'Regular departures', 'Air conditioning', 'Luggage space'],
+    available: true,
+    rating: 4.5,
+    reviewCount: 312
+  }
+];
+
+export const events = [
+  {
+    id: 'event-1',
+    name: 'Victoria Falls Carnival',
+    slug: 'victoria-falls-carnival',
+    category: 'Festivals',
+    description: 'Three days of music, culture, and celebration ringing in the new year at Victoria Falls.',
+    longDescription: 'The Victoria Falls Carnival is Southern Africa\'s premier New Year\'s celebration. Over three days, the town comes alive with live music, cultural performances, bush parties, and the iconic Devil\'s Pool swim on New Year\'s Day.',
+    date: 'Dec 28-31, 2026',
+    price: 120,
+    priceUnit: 'per person',
+    location: 'Victoria Falls Town',
+    image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80',
+    featured: true
+  },
+  {
+    id: 'event-2',
+    name: 'Africa Travel Week',
+    slug: 'africa-travel-week',
+    category: 'Conferences',
+    description: 'The continent\'s premier travel industry event bringing together tourism professionals.',
+    longDescription: 'Africa Travel Week is the continent\'s leading travel and tourism trade event, featuring keynote speakers, workshops, and networking opportunities for tourism professionals.',
+    date: 'Mar 10-12, 2027',
+    price: 0,
+    priceUnit: 'Free registration',
+    location: 'Victoria Falls Conference Centre',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+    featured: false
+  },
+  {
+    id: 'event-3',
+    name: 'Boma Drum Show',
+    slug: 'boma-drum-show',
+    category: 'Live Entertainment',
+    description: 'Traditional drumming and cultural performances — a nightly Victoria Falls tradition.',
+    longDescription: 'Experience the rhythms of Zimbabwe at the famous Boma Drum Show. Performers in traditional dress bring the beats of Africa to life in an unforgettable evening of entertainment.',
+    date: 'Nightly',
+    price: 85,
+    priceUnit: 'per person',
+    location: 'Victoria Falls Safari Lodge',
+    image: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?w=800&q=80',
+    featured: true
+  },
+  {
+    id: 'event-4',
+    name: 'Zambezi Music Festival',
+    slug: 'zambezi-music-festival',
+    category: 'Festivals',
+    description: 'Two days of African music by the river — local and international artists.',
+    longDescription: 'The Zambezi Music Festival brings together the best of African music in a stunning riverside setting. Enjoy two days of performances spanning jazz, Afrobeat, traditional, and contemporary genres.',
+    date: 'Jun 15-16, 2027',
+    price: 75,
+    priceUnit: 'per person',
+    location: 'Zambezi Riverfront',
+    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80',
+    featured: false
+  },
+  {
+    id: 'event-5',
+    name: 'Wildlife Photography Workshop',
+    slug: 'wildlife-photography-workshop',
+    category: 'Conferences',
+    description: 'Learn from award-winning wildlife photographers in the field.',
+    longDescription: 'A three-day intensive workshop combining classroom learning with field sessions in the Zambezi National Park. Learn techniques from professionals who have shot for National Geographic.',
+    date: 'Sep 5-7, 2027',
+    price: 250,
+    priceUnit: 'per person',
+    location: 'Various locations',
+    image: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800&q=80',
+    featured: false
+  },
+  {
+    id: 'event-6',
+    name: 'Independence Day Celebrations',
+    slug: 'independence-day',
+    category: 'Cultural',
+    description: 'National celebrations with traditional performances, food, and cultural showcases.',
+    longDescription: 'Celebrate Zimbabwe\'s independence with a day of cultural festivities, traditional dance performances, local cuisine, and community celebrations throughout Victoria Falls.',
+    date: 'Apr 18, 2027',
+    price: 0,
+    priceUnit: 'Free',
+    location: 'Victoria Falls Town Centre',
+    image: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80',
+    featured: false
+  }
+];
+
+export const guides = [
+  {
+    id: 'guide-1',
+    title: 'First Time in Victoria Falls',
+    slug: 'first-time',
+    category: 'Travel Guide',
+    excerpt: 'Everything you need to know for your first visit to the Smoke That Thunders.',
+    content: 'Planning your first trip to Victoria Falls? Here\'s everything you need to know, from the best time to visit to what to pack and what not to miss.',
+    image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=1200&q=80',
+    readTime: '10 min read',
+    date: '2026-06-01'
+  },
+  {
+    id: 'guide-2',
+    title: '48 Hours in Victoria Falls',
+    slug: '48-hours',
+    category: 'Travel Guide',
+    excerpt: 'A perfectly packed two-day itinerary for the time-conscious traveler.',
+    content: 'Only got two days? This guide shows you how to experience the best of Victoria Falls in just 48 hours — from sunrise helicopter flights to sunset cruises.',
+    image: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1200&q=80',
+    readTime: '8 min read',
+    date: '2026-05-15'
+  },
+  {
+    id: 'guide-3',
+    title: 'Best Sunset Spots',
+    slug: 'best-sunset-spots',
+    category: 'Travel Guide',
+    excerpt: 'Where to watch the most spectacular sunsets in Victoria Falls.',
+    content: 'From the Stanley\'s Terrace to sunset cruises on the Zambezi, these are the best spots to witness Victoria Falls\' legendary sunsets.',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80',
+    readTime: '5 min read',
+    date: '2026-04-20'
+  },
+  {
+    id: 'guide-4',
+    title: 'Family Adventure Guide',
+    slug: 'family-adventure',
+    category: 'Travel Guide',
+    excerpt: 'The best family-friendly activities and stays for your Victoria Falls trip.',
+    content: 'Victoria Falls is an incredible destination for families. From gentle wildlife encounters to educational cultural experiences, here\'s our guide to traveling with kids.',
+    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+    readTime: '7 min read',
+    date: '2026-03-10'
+  },
+  {
+    id: 'guide-5',
+    title: 'Luxury Weekend Guide',
+    slug: 'luxury-weekend',
+    category: 'Travel Guide',
+    excerpt: 'The ultimate indulgence — a curated luxury weekend in Victoria Falls.',
+    content: 'Private helicopter flights, bush dinners under the stars, and the finest accommodations — this guide is for travelers who want nothing but the best.',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80',
+    readTime: '6 min read',
+    date: '2026-02-25'
+  }
+];

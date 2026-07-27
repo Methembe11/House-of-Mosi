@@ -13,11 +13,15 @@ import ExperienceDetailPage from './pages/ExperienceDetailPage';
 import DiningPage from './pages/DiningPage';
 import RestaurantDetailPage from './pages/RestaurantDetailPage';
 import DestinationsPage from './pages/DestinationsPage';
+import TransportPage from './pages/TransportPage';
+import EventsPage from './pages/EventsPage';
 import JourneyWizardPage from './pages/JourneyWizardPage';
 import JourneyResultsPage from './pages/JourneyResultsPage';
 import JournalPage from './pages/JournalPage';
 import JournalArticlePage from './pages/JournalArticlePage';
 import CollectionPage from './pages/CollectionPage';
+import BusinessPortal from './pages/BusinessPortal';
+import TourismDashboard from './pages/TourismDashboard';
 import FloatingConcierge from './components/FloatingConcierge';
 import { JourneyProvider } from './hooks/useJourney';
 import { useTripPlanner } from './hooks/useCollection';
@@ -38,11 +42,15 @@ function AppContent() {
         <Route path="/dining" element={<DiningPage isInCollection={isInCollection} toggleCollection={toggleCollection} />} />
         <Route path="/dining/:slug" element={<RestaurantDetailPage isInCollection={isInCollection} toggleCollection={toggleCollection} />} />
         <Route path="/destinations" element={<DestinationsPage />} />
+        <Route path="/transport" element={<TransportPage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/plan" element={<JourneyWizardPage />} />
         <Route path="/plan/results" element={<JourneyResultsPage />} />
         <Route path="/journal" element={<JournalPage />} />
         <Route path="/journal/:slug" element={<JournalArticlePage />} />
         <Route path="/collection" element={<CollectionPage collection={collection} count={collection.length} toggleCollection={toggleCollection} />} />
+        <Route path="/business" element={<BusinessPortal />} />
+        <Route path="/dashboard" element={<TourismDashboard />} />
       </Routes>
       <FloatingConcierge />
       <Footer />

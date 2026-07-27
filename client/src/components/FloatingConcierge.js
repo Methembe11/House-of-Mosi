@@ -148,12 +148,43 @@ const QUICK_ACTIONS = [
   { label: 'Plan my trip', message: 'I\'d like help planning my Victoria Falls journey.' },
   { label: 'Best time to visit', message: 'When is the best time to visit Victoria Falls?' },
   { label: 'Where should I stay?', message: 'Can you recommend where to stay?' },
+  { label: 'Airport transfer', message: 'I need an airport transfer. What are my options?' },
 ];
+
+function generateAIResponse(msg) {
+  const lower = msg.toLowerCase();
+
+  if (lower.includes('plan') || lower.includes('trip') || lower.includes('itinerary')) {
+    return `I'd love to help you plan your Victoria Falls trip! Here's a suggested itinerary:\n\nDay 1: Arrive and settle in. Afternoon sunset cruise on the Zambezi.\nDay 2: Morning guided tour of Victoria Falls. Afternoon helicopter "Flight of Angels."\nDay 3: Choose your adventure — white water rafting, bungee jumping, or a safari.\n\nWould you like me to customize this based on your dates and interests?`;
+  }
+
+  if (lower.includes('best time') || lower.includes('when') || lower.includes('season')) {
+    return `Victoria Falls is year-round, but:\n\nPeak (Jun-Oct): Dry season, best wildlife viewing, lower water levels at the falls.\nGreen Season (Nov-Mar): Full flow of the falls, lush vegetation, fewer crowds.\n\nMay-August offers the best balance — the falls are spectacular and the weather is ideal.`;
+  }
+
+  if (lower.includes('stay') || lower.includes('hotel') || lower.includes('lodge')) {
+    return `Great options depending on your style:\n\nHeritage: The Victoria Falls Hotel — iconic Edwardian luxury.\nSafari: Victoria Falls Safari Lodge — elephants at your doorstep.\nExclusive: Anantara Stanley & Livingstone — just 16 suites.\nValue: Savanna68 Hotel — modern and affordable.\n\nWant me to check availability for specific dates?`;
+  }
+
+  if (lower.includes('transport') || lower.includes('transfer') || lower.includes('airport')) {
+    return `Transport options:\n\nAirport Transfer: $35 per vehicle, ~20 min ride.\nHotel Transfer: $25 per vehicle between hotel and activities.\nPrivate Driver: $50/hr for full-day exploration.\nShuttle: $15/person shared service.\n\nI recommend pre-booking your airport transfer for a smooth arrival!`;
+  }
+
+  if (lower.includes('friday') || lower.includes('saturday') || lower.includes('sunday') || lower.includes('arrive') || lower.includes('leave')) {
+    return `Here's a plan for your weekend:\n\nFriday: Airport pickup → check in → sunset cruise on the Zambezi\nSaturday: Morning helicopter flight → afternoon bungee jumping → Boma dinner & drum show\nSunday: Morning Victoria Falls guided walk → lunch at The Lookout Cafe → departure\n\nShall I adjust this or add specific activities?`;
+  }
+
+  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
+    return `Hello! Welcome to VicFalls One. I'm your AI concierge for Victoria Falls. I can help with trip planning, accommodation recommendations, transport bookings, and activity suggestions. What would you like to know?`;
+  }
+
+  return `Thank you for your interest. I can help you with:\n\n• Trip planning & itineraries\n• Accommodation recommendations\n• Activity bookings\n• Transport arrangements\n• Restaurant suggestions\n• Best time to visit\n\nJust ask me anything about Victoria Falls!`;
+}
 
 export default function FloatingConcierge() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { from: 'bot',         text: 'Welcome to House of Mosi. I can help you plan the perfect Victoria Falls experience. What would you like to know?' }
+    { from: 'bot',         text: 'Welcome to VicFalls One. I can help you plan the perfect Victoria Falls experience. What would you like to know?' }
   ]);
   const [input, setInput] = useState('');
   const messagesEnd = useRef(null);
@@ -170,7 +201,7 @@ export default function FloatingConcierge() {
     setTimeout(() => {
       setMessages(prev => [...prev, {
         from: 'bot',
-        text: 'Thank you for your interest. Our travel team will be in touch shortly with a personalised recommendation.'
+        text: generateAIResponse(msg)
       }]);
     }, 800);
   };
@@ -186,7 +217,7 @@ export default function FloatingConcierge() {
             transition={{ duration: 0.25 }}
           >
             <PanelHeader>
-              <PanelTitle>Mosi Concierge</PanelTitle>
+              <PanelTitle>VicFalls Concierge</PanelTitle>
               <CloseButton onClick={() => setOpen(false)} aria-label="Close concierge">&times;</CloseButton>
             </PanelHeader>
             <Messages>

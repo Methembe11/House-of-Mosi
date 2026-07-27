@@ -305,6 +305,8 @@ const TABS = [
   { key: 'dining', label: 'Dining' },
 ];
 
+const TRIP_FILTERS = ['All', 'Family Friendly', 'Adventure', 'Luxury', 'Budget', 'Romantic', 'Business Travel'];
+
 const STAY_FILTERS = ['All', 'Heritage Hotel', 'Safari Lodge', 'Boutique Hotel', 'Resort', 'Guest Lodge', 'Hotel'];
 const EXP_FILTERS = ['All', ...new Set(experiences.map(e => e.type))];
 
@@ -333,6 +335,17 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
     if (subFilter !== 'All') {
       if (tab === 'stay') results = results.filter(i => i.badge === subFilter);
       else if (tab === 'experience') results = results.filter(i => i.badge === subFilter);
+      else if (tab === 'all') {
+        switch (subFilter) {
+          case 'Luxury': results = results.filter(i => i.sortPrice > 300); break;
+          case 'Budget': results = results.filter(i => i.sortPrice < 100); break;
+          case 'Adventure': results = results.filter(i => i._type === 'experience'); break;
+          case 'Romantic': results = results.filter(i => i._type === 'experience' || i.sortPrice > 400); break;
+          case 'Family Friendly': results = results.filter(i => i._type === 'stay' || (i._type === 'experience' && i.sortPrice < 150)); break;
+          case 'Business Travel': results = results.filter(i => i._type === 'stay'); break;
+          default: break;
+        }
+      }
     }
 
     switch (sort) {
@@ -346,7 +359,7 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
     return results;
   }, [allItems, tab, search, subFilter, sort]);
 
-  const subFilters = tab === 'stay' ? STAY_FILTERS : tab === 'experience' ? EXP_FILTERS : [];
+  const subFilters = tab === 'all' ? TRIP_FILTERS : tab === 'stay' ? STAY_FILTERS : tab === 'experience' ? EXP_FILTERS : [];
 
   const handleHeart = (e, item) => {
     e.preventDefault();
@@ -363,8 +376,8 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
   return (
     <PageWrapper>
       <HeroSection>
-        <HeroTitle>Explore Victoria Falls</HeroTitle>
-        <HeroSub>Stays, experiences, and dining — all in one place</HeroSub>
+        <HeroTitle>Discover Victoria Falls</HeroTitle>
+        <HeroSub>Attractions, restaurants, hotels, activities, and events — all in one place</HeroSub>
         <SearchContainer>
           <SearchInput
             placeholder="Search stays, experiences, restaurants..."
