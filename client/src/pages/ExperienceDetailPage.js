@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { experiences, accommodations, restaurants } from '../data/data';
+import ReviewsSection from '../components/ReviewsSection';
 
 const PageWrapper = styled.div`padding-top: 90px;`;
 
@@ -284,6 +285,8 @@ export default function ExperienceDetailPage({ isInCollection, toggleCollection 
             ))}
           </div>
         </Section>
+
+        <ReviewsSection />
 
         <div style={{ textAlign: 'center', padding: '2rem 0', borderTop: '1px solid #E5DDD0', marginTop: '2rem' }}>
           <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.25rem', marginBottom: '1rem', color: '#6B6259' }}>Want us to build a full itinerary around this experience?</p>

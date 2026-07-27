@@ -270,6 +270,7 @@ export default function Navbar({ collectionCount = 0 }) {
               {collectionCount > 0 && <span className="badge">{collectionCount}</span>}
             </CollectionIcon>
             <PlanBtn to="/plan" $scrolled={navScrolled}>Plan Journey</PlanBtn>
+            <PlanBtn to="/auth" $scrolled={navScrolled}>Sign In</PlanBtn>
           </NavRight>
 
           <Hamburger $scrolled={navScrolled} onClick={() => setMobileOpen(true)} aria-label="Open navigation menu" aria-expanded={mobileOpen}>
@@ -283,6 +284,10 @@ export default function Navbar({ collectionCount = 0 }) {
         {NAV_ITEMS.map(item => (
           <MobileLink key={item.to} to={item.to}>{item.label}</MobileLink>
         ))}
+        <MobileLink to="/about">About</MobileLink>
+        <MobileLink to="/contact">Contact</MobileLink>
+        <MobileLink to="/auth">Sign In</MobileLink>
+        <MobileLink to="/profile">My Account</MobileLink>
         <MobilePlanBtn to="/plan">Plan Your Journey</MobilePlanBtn>
       </MobileOverlay>
     </>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div` padding-top: 90px; min-height: 100vh; display: flex; background: ${p => p.theme.colors.background}; `;
 

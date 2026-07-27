@@ -22,6 +22,15 @@ import JournalArticlePage from './pages/JournalArticlePage';
 import CollectionPage from './pages/CollectionPage';
 import BusinessPortal from './pages/BusinessPortal';
 import TourismDashboard from './pages/TourismDashboard';
+import AuthPages from './pages/AuthPages';
+import BookingPage from './pages/BookingPage';
+import RestaurantReservationPage from './pages/RestaurantReservationPage';
+import ContactPage from './pages/ContactPage';
+import TransportBookingPage from './pages/TransportBookingPage';
+import EventTicketPage from './pages/EventTicketPage';
+import UserProfilePage from './pages/UserProfilePage';
+import AboutPage from './pages/AboutPage';
+import NotFoundPage from './pages/NotFoundPage';
 import FloatingConcierge from './components/FloatingConcierge';
 import { JourneyProvider } from './hooks/useJourney';
 import { useTripPlanner } from './hooks/useCollection';
@@ -51,6 +60,15 @@ function AppContent() {
         <Route path="/collection" element={<CollectionPage collection={collection} count={collection.length} toggleCollection={toggleCollection} />} />
         <Route path="/business" element={<BusinessPortal />} />
         <Route path="/dashboard" element={<TourismDashboard />} />
+        <Route path="/auth" element={<AuthPages />} />
+        <Route path="/book" element={<BookingPage />} />
+        <Route path="/reserve" element={<RestaurantReservationPage />} />
+        <Route path="/transport/book" element={<TransportBookingPage />} />
+        <Route path="/events/book" element={<EventTicketPage />} />
+        <Route path="/profile" element={<UserProfilePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <FloatingConcierge />
       <Footer />

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { accommodations, experiences } from '../data/data';
 import Icon from '../components/Icon';
+import ReviewsSection from '../components/ReviewsSection';
 
 const PageWrapper = styled.div`padding-top: 90px;`;
 
@@ -608,6 +609,10 @@ export default function AccommodationDetailPage({ isInCollection, toggleCollecti
           </BookingCard>
         </Sidebar>
       </Content>
+
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 2rem 3rem' }}>
+        <ReviewsSection />
+      </div>
     </PageWrapper>
   );
 }
