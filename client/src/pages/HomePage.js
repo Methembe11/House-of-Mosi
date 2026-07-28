@@ -24,14 +24,17 @@ const Divider = styled.div` width:60px; height:1px; background:${p=>p.theme.colo
 const Hero = styled.section`
   height: 100vh; min-height: 750px; display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, ${p => p.theme.colors.primaryDark} 0%, ${p => p.theme.colors.primary} 40%, #1a3830 100%);
+  background: ${p => p.theme.colors.primaryDark};
   &::before {
     content:''; position:absolute; inset:0;
-    background: radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.07) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(107,79,58,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(216,195,165,0.05) 0%, transparent 40%);
+    background: url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&q=85') center/cover no-repeat;
+    z-index:0;
   }
-  &::after { content:''; position:absolute; bottom:0; left:0; right:0; height:250px; background: linear-gradient(transparent, ${p => p.theme.colors.background}); }
+  &::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(21,42,36,0.7) 0%, rgba(31,58,50,0.45) 40%, rgba(21,42,36,0.65) 100%);
+    z-index:1;
+  }
 `;
 const HeroContent = styled.div` text-align:center; position:relative; z-index:2; padding:0 2rem; max-width:880px; `;
 const HeroLabel = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.5rem; `;
@@ -45,8 +48,8 @@ const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradien
 
 /* ─── WHY VICTORIA FALLS ─── */
 const WhySection = styled.section` padding:0; `;
-const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:300px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
-const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:300px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:250px; } } `;
+const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:400px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
+const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:400px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:280px; } } `;
 const WhyContent = styled.div` display:flex; flex-direction:column; justify-content:center; padding:3rem 3.5rem; background:${p=>p.theme.colors.cream}; @media(max-width:${p=>p.theme.breakpoints.tablet}){ padding:2.5rem 2rem; } `;
 const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.cocoa}; } `;
 const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:${p=>p.theme.colors.text}; line-height:1.15; margin-bottom:1.5rem; `;
@@ -56,13 +59,6 @@ const WhyItem = styled(motion.div)` display:flex; gap:1.25rem; align-items:flex-
 const WhyItemIcon = styled.div` flex-shrink:0; width:44px; height:44px; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.3s; ${WhyItem}:hover &{ background:${p=>p.theme.colors.cocoa}; } `;
 const WhyItemTitle = styled.h4` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.lg}; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.15rem; `;
 const WhyItemText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; line-height:1.6; `;
-
-/* ─── VALUE PROPS ─── */
-const ValueGrid = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; @media(max-width:${p=>p.theme.breakpoints.desktop}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
-const ValueCard = styled.div` text-align:center; padding:3rem 2rem; background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); &:hover{ box-shadow:${p=>p.theme.shadows.xl}; transform:translateY(-6px); border-color:transparent; } `;
-const ValueIcon = styled.div` width:72px; height:72px; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; border-radius:50%; transition:all 0.4s; ${ValueCard}:hover &{ background:${p=>p.theme.colors.cocoa}; } `;
-const ValueTitle = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xxl}; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.75rem; `;
-const ValueText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.8; `;
 
 /* ─── HANDPICKED STAYS ─── */
 const StaysScroll = styled.div` display:flex; gap:2rem; padding:0 2rem; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; &::-webkit-scrollbar{display:none;} `;
@@ -130,13 +126,11 @@ const GuideCard = styled(Link)` display:block; background:${p=>p.theme.colors.wh
 const GCardImg = styled.div` height:220px; overflow:hidden; background:${p=>p.theme.colors.backgroundAlt}; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); } `;
 const GCardBody = styled.div` padding:1.5rem; .cat{ font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; } h3{ font-family:${p=>p.theme.fonts.serif}; font-size:1.15rem; font-weight:500; margin-bottom:0.5rem; line-height:1.3; color:${p=>p.theme.colors.text}; } p{ font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.7; } `;
 
-/* ─── SOCIAL PROOF ─── */
-const ProofSection = styled.div` background:${p=>p.theme.colors.cream}; padding:${p=>p.theme.spacing.section} 0; `;
-const ProofInner = styled.div` max-width:1400px; margin:0 auto; padding:0 2rem; `;
-const ProofGrid = styled.div` display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
-const ProofCard = styled.div` background:${p=>p.theme.colors.white}; padding:2.75rem; border-left:3px solid ${p=>p.theme.colors.champagne}; `;
-const ProofQuote = styled.p` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; color:${p=>p.theme.colors.text}; line-height:1.7; font-style:italic; margin-bottom:1.75rem; font-weight:400; `;
-const ProofAuthor = styled.div` .name{ font-weight:600; color:${p=>p.theme.colors.text}; font-size:${p=>p.theme.fontSizes.md}; } .trip{ font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; margin-top:0.25rem; } `;
+/* ─── TRUSTED BY ─── */
+const PartnersSection = styled.section` padding:5rem 2rem; max-width:1400px; margin:0 auto; text-align:center; `;
+const PartnersLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:3rem; `;
+const PartnersGrid = styled.div` display:flex; align-items:center; justify-content:center; gap:4rem; flex-wrap:wrap; opacity:0.5; transition:opacity 0.3s; &:hover{ opacity:0.7; } @media(max-width:${p=>p.theme.breakpoints.tablet}){ gap:2.5rem; } `;
+const PartnerLogo = styled.div` display:flex; align-items:center; justify-content:center; gap:0.75rem; font-family:${p=>p.theme.fonts.serif}; font-size:1.1rem; font-weight:500; color:${p=>p.theme.colors.text}; letter-spacing:0.02em; white-space:nowrap; svg{ flex-shrink:0; } `;
 
 /* ─── FINAL CTA ─── */
 const FinalCTA = styled.section` position:relative; height:60vh; min-height:450px; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; `;
@@ -180,16 +174,19 @@ const MAP_PINS = [
 ];
 
 const GUIDE_DATA = [
-  { title: 'First Time in Victoria Falls', slug: 'first-time', excerpt: 'Everything you need to know for your first visit to the Smoke That Thunders.', image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&q=80' },
+  { title: 'First Time in Victoria Falls', slug: 'first-time', excerpt: 'Everything you need to know for your first visit to the Smoke That Thunders.', image: 'https://images.unsplash.com/photo-1590003351425-4e1c93b8e89a?w=800&q=80' },
   { title: '48 Hours in Victoria Falls', slug: '48-hours', excerpt: 'A perfectly packed two-day itinerary for the time-conscious traveler.', image: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800&q=80' },
-  { title: 'Best Sunset Spots', slug: 'best-sunset-spots', excerpt: 'Where to watch the most spectacular sunsets in Victoria Falls.', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80' },
-  { title: 'Family Adventure Guide', slug: 'family-adventure', excerpt: 'The best family-friendly activities and stays for your Victoria Falls trip.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80' },
+  { title: 'Best Sunset Spots', slug: 'best-sunset-spots', excerpt: 'Where to watch the most spectacular sunsets over the Zambezi.', image: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&q=80' },
+  { title: 'Family Adventure Guide', slug: 'family-adventure', excerpt: 'The best family-friendly activities and stays for your Victoria Falls trip.', image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80' },
 ];
 
-const PROOF_DATA = [
-  { quote: 'VicFalls One made our honeymoon effortless. The helicopter flight over the falls at sunrise was the highlight of our lives.', name: 'Sarah & James', trip: '5-Day Honeymoon Journey' },
-  { quote: 'We had no idea Victoria Falls had this level of luxury. Having everything in one platform saved us so much time.', name: 'The Chen Family', trip: '4-Day Family Discovery' },
-  { quote: 'From the sunset cruise to the bush dinner under the stars — every moment was perfectly curated.', name: 'Amara & Kofi', trip: '3-Day Romantic Retreat' },
+const PARTNER_DATA = [
+  { name: 'Wilderness Safaris', icon: 'mountain' },
+  { name: 'Anantara Hotels', icon: 'dining' },
+  { name: 'Shearwater Adventures', icon: 'compass' },
+  { name: 'The Victoria Falls Hotel', icon: 'sun' },
+  { name: 'Ilala Lodge', icon: 'pool' },
+  { name: 'Zimbabwe Tourism Authority', icon: 'mapPin' },
 ];
 
 /* ─── COMPONENT ─── */
@@ -266,35 +263,7 @@ export default function HomePage() {
         </WhyGrid>
       </WhySection>
 
-      {/* ─── 3. WHAT IS VFCALLS ONE ─── */}
-      <Section>
-        <SectionHeader>
-          <SectionLabel>What is VicFalls One?</SectionLabel>
-          <Divider />
-          <SectionTitle>Everything You Need, One Platform</SectionTitle>
-          <SectionDesc>The all-in-one platform connecting travellers with the finest of Victoria Falls.</SectionDesc>
-        </SectionHeader>
-        <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:'-50px'}} variants={stagger}>
-          <ValueGrid>
-            {[
-              { icon: 'compass', title: 'Discover', text: 'Find attractions, events, restaurants, and hidden gems curated by locals.' },
-              { icon: 'calendar', title: 'Book', text: 'Secure experiences, transport, dining, and accommodations instantly.' },
-              { icon: 'mountain', title: 'Plan', text: 'Build personalized itineraries powered by AI and local expertise.' },
-              { icon: 'binoculars', title: 'Experience', text: 'Navigate Victoria Falls with everything in one beautifully designed place.' },
-            ].map((v, i) => (
-              <motion.div key={i} variants={fadeUp}>
-                <ValueCard>
-                  <ValueIcon><Icon name={v.icon} size={28} /></ValueIcon>
-                  <ValueTitle>{v.title}</ValueTitle>
-                  <ValueText>{v.text}</ValueText>
-                </ValueCard>
-              </motion.div>
-            ))}
-          </ValueGrid>
-        </motion.div>
-      </Section>
-
-      {/* ─── 4. HANDPICKED STAYS ─── */}
+      {/* ─── 3. HANDPICKED STAYS ─── */}
       <FullBleed>
         <SectionHeader style={{padding:'0 2rem'}}>
           <SectionLabel>Exceptional Places to Stay</SectionLabel>
@@ -326,7 +295,7 @@ export default function HomePage() {
         </StaysScroll>
       </FullBleed>
 
-      {/* ─── 5. VISITOR PLATFORM BANNER ─── */}
+      {/* ─── 4. VISITOR PLATFORM BANNER ─── */}
       <BannerSection
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -378,7 +347,7 @@ export default function HomePage() {
         </BannerControls>
       </BannerSection>
 
-      {/* ─── 6. SIGNATURE JOURNEYS ─── */}
+      {/* ─── 5. SIGNATURE JOURNEYS ─── */}
       <FullBleed>
         <SectionHeader style={{padding:'0 2rem'}}>
           <SectionLabel>Signature Journeys</SectionLabel>
@@ -403,7 +372,7 @@ export default function HomePage() {
         </JourneyScroll>
       </FullBleed>
 
-      {/* ─── 7. INTERACTIVE MAP ─── */}
+      {/* ─── 6. INTERACTIVE MAP ─── */}
       <MapSection>
         <MapInner>
           <SectionHeader>
@@ -462,7 +431,7 @@ export default function HomePage() {
         </MapInner>
       </MapSection>
 
-      {/* ─── 8. GUIDES & STORIES ─── */}
+      {/* ─── 7. GUIDES & STORIES ─── */}
       <Section>
         <SectionHeader>
           <SectionLabel>Guides & Stories</SectionLabel>
@@ -488,31 +457,20 @@ export default function HomePage() {
         </motion.div>
       </Section>
 
-      {/* ─── 9. SOCIAL PROOF ─── */}
-      <ProofSection>
-        <ProofInner>
-          <SectionHeader>
-            <SectionLabel>Recent Journeys</SectionLabel>
-            <Divider />
-            <SectionTitle>Guest Experiences</SectionTitle>
-          </SectionHeader>
-          <ProofGrid>
-            {PROOF_DATA.map((p, i) => (
-              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{once:true}} variants={fadeUp}>
-                <ProofCard>
-                  <ProofQuote>"{p.quote}"</ProofQuote>
-                  <ProofAuthor>
-                    <div className="name">{p.name}</div>
-                    <div className="trip">{p.trip}</div>
-                  </ProofAuthor>
-                </ProofCard>
-              </motion.div>
-            ))}
-          </ProofGrid>
-        </ProofInner>
-      </ProofSection>
+      {/* ─── 8. TRUSTED BY ─── */}
+      <PartnersSection>
+        <PartnersLabel>Trusted by Leading Operators</PartnersLabel>
+        <PartnersGrid>
+          {PARTNER_DATA.map((p, i) => (
+            <PartnerLogo key={i}>
+              <Icon name={p.icon} size={22} />
+              {p.name}
+            </PartnerLogo>
+          ))}
+        </PartnersGrid>
+      </PartnersSection>
 
-      {/* ─── 10. FINAL CTA ─── */}
+      {/* ─── 9. FINAL CTA ─── */}
       <FinalCTA>
         <FinalCTABg>
           <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1800&q=85" alt="Victoria Falls" />
