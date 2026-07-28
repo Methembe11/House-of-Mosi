@@ -47,7 +47,7 @@ const HeroScroll = styled(motion.div)` position:absolute; bottom:3rem; left:50%;
 const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradient(transparent, rgba(255,255,255,0.4)); `;
 
 /* ─── WHY VICTORIA FALLS ─── */
-const WhySection = styled.section` padding:0; `;
+const WhySection = styled.section` padding:6rem 0 0; `;
 const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:400px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
 const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:400px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:280px; } } `;
 const WhyContent = styled.div` display:flex; flex-direction:column; justify-content:center; padding:3rem 3.5rem; background:${p=>p.theme.colors.cream}; @media(max-width:${p=>p.theme.breakpoints.tablet}){ padding:2.5rem 2rem; } `;
@@ -237,9 +237,6 @@ export default function HomePage() {
       {/* ─── 2. WHY VICTORIA FALLS ─── */}
       <WhySection>
         <WhyGrid>
-          <WhyImage>
-            <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&q=85" alt="Victoria Falls" />
-          </WhyImage>
           <WhyContent>
             <WhyLabel>Why Victoria Falls</WhyLabel>
             <WhyTitle>A Wonder of the World,<br />A Playground for the Soul</WhyTitle>
@@ -260,6 +257,9 @@ export default function HomePage() {
               ))}
             </WhyList>
           </WhyContent>
+          <WhyImage>
+            <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&q=85" alt="Victoria Falls" />
+          </WhyImage>
         </WhyGrid>
       </WhySection>
 
