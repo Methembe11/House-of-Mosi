@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../components/Icon';
 import { signatureJourneys } from '../data/data';
 
@@ -11,27 +11,27 @@ const fadeUp = {
 };
 const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 
+/* ─── SHARED ─── */
+const Section = styled.section` padding:${p=>p.theme.spacing.section} 2rem; max-width:1400px; margin:0 auto; `;
+const FullBleed = styled.section` padding:${p=>p.theme.spacing.section} 0; overflow:hidden; `;
+const SectionHeader = styled.div` text-align:center; margin-bottom:4rem; `;
+const SectionLabel = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; display:block; margin-bottom:1rem; `;
+const SectionTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4vw,3.25rem); font-weight:300; color:${p=>p.theme.colors.text}; margin-bottom:1.25rem; letter-spacing:-0.01em; `;
+const SectionDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:${p=>p.theme.colors.textLight}; max-width:520px; margin:0 auto; line-height:1.8; `;
+const Divider = styled.div` width:60px; height:1px; background:${p=>p.theme.colors.champagne}; margin:0 auto 2rem; `;
+
 /* ─── HERO ─── */
 const Hero = styled.section`
-  height: 100vh;
-  min-height: 750px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  height: 100vh; min-height: 750px; display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
   background: linear-gradient(135deg, ${p => p.theme.colors.primaryDark} 0%, ${p => p.theme.colors.primary} 40%, #1a3830 100%);
-  overflow: hidden;
   &::before {
     content:''; position:absolute; inset:0;
-    background:
-      radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.07) 0%, transparent 50%),
+    background: radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.07) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, rgba(107,79,58,0.08) 0%, transparent 50%),
       radial-gradient(ellipse at 50% 80%, rgba(216,195,165,0.05) 0%, transparent 40%);
   }
-  &::after {
-    content:''; position:absolute; bottom:0; left:0; right:0; height:250px;
-    background: linear-gradient(transparent, ${p => p.theme.colors.background});
-  }
+  &::after { content:''; position:absolute; bottom:0; left:0; right:0; height:250px; background: linear-gradient(transparent, ${p => p.theme.colors.background}); }
 `;
 const HeroContent = styled.div` text-align:center; position:relative; z-index:2; padding:0 2rem; max-width:880px; `;
 const HeroLabel = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.5rem; `;
@@ -43,30 +43,44 @@ const BtnOutline = styled(Link)` padding:1rem 3rem; background:transparent; colo
 const HeroScroll = styled(motion.div)` position:absolute; bottom:3rem; left:50%; transform:translateX(-50%); z-index:3; color:rgba(255,255,255,0.4); font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.2em; display:flex; flex-direction:column; align-items:center; gap:0.75rem; `;
 const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradient(transparent, rgba(255,255,255,0.4)); `;
 
-/* ─── SHARED ─── */
-const Section = styled.section` padding:${p=>p.theme.spacing.section} 2rem; max-width:1400px; margin:0 auto; `;
-const FullBleed = styled.section` padding:${p=>p.theme.spacing.section} 0; overflow:hidden; `;
-const SectionHeader = styled.div` text-align:center; margin-bottom:4rem; `;
-const SectionLabel = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; display:block; margin-bottom:1rem; `;
-const SectionTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4vw,3.25rem); font-weight:300; color:${p=>p.theme.colors.text}; margin-bottom:1.25rem; letter-spacing:-0.01em; `;
-const SectionDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:${p=>p.theme.colors.textLight}; max-width:520px; margin:0 auto; line-height:1.8; `;
-const Divider = styled.div` width:60px; height:1px; background:${p=>p.theme.colors.champagne}; margin:0 auto 2rem; `;
+/* ─── WHY VICTORIA FALLS ─── */
+const WhySection = styled.section` position:relative; min-height:700px; display:flex; align-items:center; overflow:hidden; `;
+const WhyBg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; } `;
+const WhyOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(135deg, rgba(21,42,36,0.88) 0%, rgba(31,58,50,0.72) 50%, rgba(21,42,36,0.85) 100%); `;
+const WhyInner = styled.div` position:relative; z-index:2; max-width:1400px; margin:0 auto; padding:5rem 2rem; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; gap:3rem; } `;
+const WhyText = styled.div` color:${p=>p.theme.colors.white}; `;
+const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.25rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.champagne}; } `;
+const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4vw,3.25rem); font-weight:300; line-height:1.15; margin-bottom:1rem; `;
+const WhySubtitle = styled.p` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; font-weight:300; color:${p=>p.theme.colors.champagne}; font-style:italic; margin-bottom:1.5rem; line-height:1.5; `;
+const WhyDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:rgba(255,255,255,0.7); line-height:1.8; max-width:520px; `;
+const WhyFeatures = styled.div` display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; `;
+const WhyFeature = styled(motion.div)` padding:1.5rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(4px); transition:all 0.3s; &:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); } `;
+const WhyFeatureIcon = styled.div` color:${p=>p.theme.colors.champagne}; margin-bottom:0.75rem; `;
+const WhyFeatureTitle = styled.h4` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.lg}; font-weight:500; color:${p=>p.theme.colors.white}; margin-bottom:0.35rem; `;
+const WhyFeatureText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:rgba(255,255,255,0.6); line-height:1.6; `;
 
-/* ─── 2. WHAT IS VFCALLS ONE ─── */
+/* ─── VALUE PROPS ─── */
 const ValueGrid = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; @media(max-width:${p=>p.theme.breakpoints.desktop}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
 const ValueCard = styled.div` text-align:center; padding:3rem 2rem; background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); &:hover{ box-shadow:${p=>p.theme.shadows.xl}; transform:translateY(-6px); border-color:transparent; } `;
 const ValueIcon = styled.div` width:72px; height:72px; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; border-radius:50%; transition:all 0.4s; ${ValueCard}:hover &{ background:${p=>p.theme.colors.cocoa}; } `;
 const ValueTitle = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xxl}; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.75rem; `;
 const ValueText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.8; `;
 
-/* ─── 3. ECOSYSTEM ─── */
-const EcoGrid = styled.div` display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
-const EcoCard = styled.div` padding:2.25rem; background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; display:flex; align-items:flex-start; gap:1.25rem; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); &:hover{ border-color:${p=>p.theme.colors.champagne}; box-shadow:${p=>p.theme.shadows.md}; transform:translateY(-3px); } `;
-const EcoIcon = styled.div` flex-shrink:0; width:50px; height:50px; background:rgba(31,58,50,0.06); color:${p=>p.theme.colors.primary}; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.3s; ${EcoCard}:hover &{ background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; } `;
-const EcoTitle = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.35rem; `;
-const EcoTags = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; line-height:1.6; `;
+/* ─── HANDPICKED STAYS ─── */
+const StaysScroll = styled.div` display:flex; gap:2rem; padding:0 2rem; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; &::-webkit-scrollbar{display:none;} `;
+const StayCard = styled(Link)` flex:0 0 380px; scroll-snap-align:start; background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; overflow:hidden; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); display:block; text-decoration:none; color:inherit; &:hover{ box-shadow:${p=>p.theme.shadows.lg}; transform:translateY(-4px); border-color:transparent; .stayimg img{transform:scale(1.05);} } `;
+const StayImg = styled.div` height:260px; overflow:hidden; position:relative; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); } `;
+const StayBadge = styled.div` position:absolute; top:1rem; left:1rem; padding:0.35rem 0.75rem; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); color:white; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:500; `;
+const StayBody = styled.div` padding:1.75rem; `;
+const StayCategory = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; `;
+const StayName = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:1.35rem; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.75rem; line-height:1.3; `;
+const StayMeta = styled.div` display:flex; align-items:center; gap:1rem; margin-bottom:1rem; font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; `;
+const StayRating = styled.span` color:${p=>p.theme.colors.gold}; font-weight:600; `;
+const StayPriceRow = styled.div` display:flex; justify-content:space-between; align-items:center; padding-top:1rem; border-top:1px solid ${p=>p.theme.colors.borderLight}; `;
+const StayPrice = styled.div` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; span{ font-size:${p=>p.theme.fontSizes.xl}; font-weight:600; color:${p=>p.theme.colors.text}; } `;
+const StayCTA = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.1em; font-weight:600; color:${p=>p.theme.colors.primary}; transition:color 0.3s; ${StayCard}:hover &{ color:${p=>p.theme.colors.cocoa}; } `;
 
-/* ─── 4. VISITOR PLATFORM BANNER ─── */
+/* ─── BANNER ─── */
 const BannerSection = styled.section` position:relative; height:75vh; min-height:550px; overflow:hidden; background:${p=>p.theme.colors.primaryDark}; `;
 const BannerSlide = styled.div` position:absolute; inset:0; opacity:${p=>p.$active?1:0}; transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1); pointer-events:${p=>p.$active?'auto':'none'}; `;
 const BannerImg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; transition:transform 8s linear; ${p=>p.$active && css`img{ transform:scale(1.08); }`} } `;
@@ -75,7 +89,7 @@ const BannerContent = styled.div` position:relative; z-index:2; height:100%; dis
 const BannerTag = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.25rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.champagne}; } `;
 const BannerTitle = styled(motion.h2)` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4.5vw,3.75rem); font-weight:300; color:${p=>p.theme.colors.white}; line-height:1.15; margin-bottom:1.25rem; max-width:600px; `;
 const BannerDesc = styled(motion.p)` font-size:${p=>p.theme.fontSizes.md}; color:rgba(255,255,255,0.7); max-width:480px; line-height:1.8; margin-bottom:2.5rem; `;
-const BannerCTA = styled(motion(Link))` display:inline-flex; align-items:center; gap:0.75rem; padding:1rem 2.5rem; background:transparent; border:1px solid rgba(255,255,255,0.3); color:${p=>p.theme.colors.white}; font-size:${p=>p.theme.fontSizes.sm}; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.4s; width:fit-content; &:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.5); } `;
+const BannerCTA = styled(motion(Link))` display:inline-flex; align-items:center; gap:0.75rem; padding:1rem 2.5rem; background:transparent; border:1px solid rgba(255,255,255,0.3); color:${p=>p.theme.colors.white}; font-size:${p=>p.theme.fontSizes.sm}; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.4s; width:fit-content; text-decoration:none; &:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.5); } `;
 const BannerControls = styled.div` position:absolute; bottom:3rem; left:50%; transform:translateX(-50%); z-index:5; display:flex; align-items:center; gap:1.5rem; `;
 const BannerDot = styled.button` width:${p=>p.$active?'32px':'8px'}; height:8px; border-radius:4px; background:${p=>p.$active?p.theme.colors.champagne:'rgba(255,255,255,0.3)'}; border:none; cursor:pointer; transition:all 0.4s; padding:0; &:hover{ background:rgba(255,255,255,0.6); } `;
 const BannerCounter = styled.div` position:absolute; top:3rem; right:4rem; z-index:5; font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; color:rgba(255,255,255,0.5); font-weight:300; `;
@@ -83,9 +97,9 @@ const BannerArrow = styled.button` position:absolute; top:50%; ${p=>p.$left?'lef
 const PlatformIconStrip = styled.div` position:absolute; bottom:6rem; left:0; right:0; z-index:5; display:flex; justify-content:center; gap:2.5rem; opacity:0.4; transition:opacity 0.3s; ${BannerSection}:hover &{ opacity:0.7; } `;
 const PlatformIconItem = styled(Link)` display:flex; flex-direction:column; align-items:center; gap:0.5rem; color:rgba(255,255,255,0.8); text-decoration:none; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.3s; &:hover{ color:${p=>p.theme.colors.champagne}; } ${p=>p.$active && css` color:${p=>p.theme.colors.champagne}; `} `;
 
-/* ─── 5. SIGNATURE JOURNEYS ─── */
+/* ─── JOURNEYS ─── */
 const JourneyScroll = styled.div` display:flex; gap:2rem; padding:0 2rem; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; &::-webkit-scrollbar{display:none;} `;
-const JourneyCard = styled(Link)` flex:0 0 360px; scroll-snap-align:start; position:relative; height:480px; overflow:hidden; display:block; border-radius:2px; &:hover .jimg img{transform:scale(1.06);} &:hover .joverlay{opacity:1;} `;
+const JourneyCard = styled(Link)` flex:0 0 360px; scroll-snap-align:start; position:relative; height:480px; overflow:hidden; display:block; border-radius:2px; text-decoration:none; &:hover .jimg img{transform:scale(1.06);} &:hover .joverlay{opacity:1;} `;
 const JImg = styled.div` position:absolute; inset:0; background:${p=>p.theme.colors.primary}; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.7s cubic-bezier(0.22,1,0.36,1); } `;
 const JOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(transparent 35%, rgba(21,42,36,0.93)); display:flex; flex-direction:column; justify-content:flex-end; padding:2.5rem; transition:opacity 0.3s; `;
 const JTag = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.25em; color:${p=>p.theme.colors.champagne}; margin-bottom:0.5rem; font-weight:500; `;
@@ -93,13 +107,32 @@ const JName = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:1.65re
 const JMeta = styled.div` display:flex; align-items:center; gap:1rem; font-size:${p=>p.theme.fontSizes.sm}; color:rgba(255,255,255,0.6); `;
 const JPrice = styled.span` color:${p=>p.theme.colors.champagne}; font-weight:600; `;
 
-/* ─── 6. GUIDES ─── */
+/* ─── INTERACTIVE MAP ─── */
+const MapSection = styled.section` background:${p=>p.theme.colors.cream}; padding:${p=>p.theme.spacing.section} 0; `;
+const MapInner = styled.div` max-width:1400px; margin:0 auto; padding:0 2rem; `;
+const MapLayout = styled.div` display:grid; grid-template-columns:1.3fr 1fr; gap:3rem; align-items:start; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
+const MapCanvas = styled.div` position:relative; background:${p=>p.theme.colors.primary}; border-radius:4px; overflow:hidden; aspect-ratio:4/3; `;
+const MapSvg = styled.div` position:absolute; inset:0; display:flex; align-items:center; justify-content:center; `;
+const MapPin = styled.button` position:absolute; width:${p=>p.$active?'18px':'14px'}; height:${p=>p.$active?'18px':'14px'}; border-radius:50%; background:${p=>p.$active?p.theme.colors.champagne:p.theme.colors.white}; border:2px solid ${p=>p.theme.colors.primary}; cursor:pointer; transition:all 0.3s; z-index:${p=>p.$active?3:2}; transform:translate(-50%,-50%); ${p=>p.$active && css` box-shadow:0 0 0 6px rgba(216,195,165,0.3); `} &:hover{ transform:translate(-50%,-50%) scale(1.2); } `;
+const MapPinLabel = styled.div` position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); white-space:nowrap; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:${p=>p.theme.colors.white}; background:${p=>p.theme.colors.primary}; padding:0.25rem 0.6rem; opacity:${p=>p.$active?1:0}; transition:opacity 0.3s; pointer-events:none; `;
+const MapInfo = styled.div` background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; padding:2rem; `;
+const MapInfoCategory = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; `;
+const MapInfoName = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:1.5rem; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.5rem; `;
+const MapInfoRating = styled.div` color:${p=>p.theme.colors.gold}; font-size:${p=>p.theme.fontSizes.sm}; margin-bottom:0.75rem; `;
+const MapInfoDesc = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.7; margin-bottom:1.25rem; `;
+const MapInfoPrice = styled.div` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; margin-bottom:1.25rem; span{ font-size:${p=>p.theme.fontSizes.xl}; font-weight:600; color:${p=>p.theme.colors.text}; } `;
+const MapInfoBtn = styled(Link)` display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.5rem; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; font-size:${p=>p.theme.fontSizes.sm}; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; transition:all 0.3s; &:hover{ background:${p=>p.theme.colors.primaryDark}; } `;
+const MapPinsList = styled.div` display:flex; flex-direction:column; gap:0.5rem; margin-top:1.5rem; `;
+const MapPinBtn = styled.button` display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; background:${p=>p.$active?p.theme.colors.primary:'transparent'}; color:${p=>p.$active?p.theme.colors.white:p.theme.colors.text}; border:1px solid ${p=>p.$active?p.theme.colors.primary:p.theme.colors.borderLight}; text-align:left; cursor:pointer; transition:all 0.3s; font-size:${p=>p.theme.fontSizes.sm}; font-family:${p=>p.theme.fonts.sans}; &:hover{ border-color:${p=>p.theme.colors.primary}; } `;
+const PinDot = styled.span` width:8px; height:8px; border-radius:50%; flex-shrink:0; background:${p=>p.$active?p.theme.colors.champagne:p.theme.colors.primary}; `;
+
+/* ─── GUIDES ─── */
 const GuidesGrid = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:1.75rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
-const GuideCard = styled(Link)` display:block; background:${p=>p.theme.colors.white}; overflow:hidden; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); &:hover{ box-shadow:${p=>p.theme.shadows.md}; .gimg img{transform:scale(1.04);} } `;
+const GuideCard = styled(Link)` display:block; background:${p=>p.theme.colors.white}; overflow:hidden; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); text-decoration:none; color:inherit; &:hover{ box-shadow:${p=>p.theme.shadows.md}; .gimg img{transform:scale(1.04);} } `;
 const GCardImg = styled.div` height:220px; overflow:hidden; background:${p=>p.theme.colors.backgroundAlt}; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); } `;
 const GCardBody = styled.div` padding:1.5rem; .cat{ font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; } h3{ font-family:${p=>p.theme.fonts.serif}; font-size:1.15rem; font-weight:500; margin-bottom:0.5rem; line-height:1.3; color:${p=>p.theme.colors.text}; } p{ font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.7; } `;
 
-/* ─── 7. SOCIAL PROOF ─── */
+/* ─── SOCIAL PROOF ─── */
 const ProofSection = styled.div` background:${p=>p.theme.colors.cream}; padding:${p=>p.theme.spacing.section} 0; `;
 const ProofInner = styled.div` max-width:1400px; margin:0 auto; padding:0 2rem; `;
 const ProofGrid = styled.div` display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
@@ -107,20 +140,45 @@ const ProofCard = styled.div` background:${p=>p.theme.colors.white}; padding:2.7
 const ProofQuote = styled.p` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; color:${p=>p.theme.colors.text}; line-height:1.7; font-style:italic; margin-bottom:1.75rem; font-weight:400; `;
 const ProofAuthor = styled.div` .name{ font-weight:600; color:${p=>p.theme.colors.text}; font-size:${p=>p.theme.fontSizes.md}; } .trip{ font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; margin-top:0.25rem; } `;
 
-/* ─── 8. FINAL CTA ─── */
-const FinalCTA = styled.section` position:relative; height:60vh; min-height:450px; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; background:linear-gradient(135deg, ${p=>p.theme.colors.primaryDark}, ${p=>p.theme.colors.primary}); `;
+/* ─── FINAL CTA ─── */
+const FinalCTA = styled.section` position:relative; height:60vh; min-height:450px; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; `;
+const FinalCTABg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; } `;
+const FinalCTAOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(135deg, rgba(21,42,36,0.85), rgba(31,58,50,0.7)); `;
 const FinalCTAContent = styled.div` position:relative; z-index:2; padding:2rem; `;
 const FinalCTATitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,5vw,3.5rem); font-weight:300; color:${p=>p.theme.colors.white}; margin-bottom:2.5rem; line-height:1.2; `;
 const FinalCTAButtons = styled.div` display:flex; gap:1.25rem; justify-content:center; flex-wrap:wrap; `;
 
 /* ─── DATA ─── */
+const WHY_FEATURES = [
+  { icon: 'compass', title: 'UNESCO World Heritage Site', text: 'One of the Seven Natural Wonders of the World.' },
+  { icon: 'sun', title: 'Wildlife Corridors', text: 'Connecting Zambezi National Park and beyond.' },
+  { icon: 'mountain', title: 'Adventure Capital', text: 'Bungee, rafting, helicopter flights, and more.' },
+  { icon: 'pool', title: 'Luxury Meets Wilderness', text: 'World-class lodges in pristine settings.' },
+];
+
+const FEATURED_STAYS = [
+  { id: 'acc-1', slug: 'the-victoria-falls-hotel', category: 'Heritage Hotel', name: 'The Victoria Falls Hotel', rating: 9.1, reviews: 251, price: 577, image: 'https://www.victoriafallshotel.com/data/files/1.jpg' },
+  { id: 'acc-2', slug: 'victoria-falls-safari-lodge', category: 'Safari Lodge', name: 'Victoria Falls Safari Lodge', rating: 9.0, reviews: 432, price: 418, image: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80' },
+  { id: 'acc-3', slug: 'anantara-stanley-livingstone', category: 'Boutique Hotel', name: 'Anantara Stanley & Livingstone', rating: 9.2, reviews: 24, price: 400, image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80' },
+  { id: 'acc-7', slug: 'ilala-lodge-hotel', category: 'Lodge', name: 'Ilala Lodge Hotel', rating: 8.8, reviews: 2200, price: 150, image: 'https://www.ilalalodge.com/wp-content/uploads/2022/08/Ilala-Lodge-Hotel-and-pools-ILH.jpeg' },
+];
+
 const BANNER_SLIDES = [
   { title: 'Discover Victoria Falls', desc: 'Explore the Smoke That Thunders — from misty rainforests to the legendary Victoria Falls Bridge.', image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80', to: '/discover', icon: 'compass' },
   { title: 'Curated Experiences', desc: 'Helicopter flights, sunset cruises, white-water rafting, and bush walks with world-class guides.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600&q=80', to: '/experiences', icon: 'sun' },
   { title: 'World-Class Dining', desc: 'Bush dinners under the stars, fine dining at historic hotels, and authentic local cuisine.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', to: '/dining', icon: 'dining' },
-  { title: 'Seamless Transport', desc: 'Airport transfers, private drivers, and guided transfers across Victoria Falls.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600&q=80', to: '/transport', icon: 'car' },
+  { title: 'Seamless Transport', desc: 'Airport transfers, private drivers, and guided transfers across Victoria Falls.', image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1600&q=80', to: '/transport', icon: 'car' },
   { title: 'Unforgettable Events', desc: 'Live entertainment, cultural festivals, and exclusive private events throughout the year.', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&q=80', to: '/events', icon: 'ticket' },
   { title: 'Build Your Journey', desc: 'AI-powered trip planning — tell us your style and we\'ll craft the perfect Victoria Falls itinerary.', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80', to: '/plan', icon: 'mapPin' },
+];
+
+const MAP_PINS = [
+  { id: 'falls', name: 'Victoria Falls', x: '35%', y: '42%', category: 'Natural Wonder', desc: 'The main falls — 1.7km of cascading water, 108m drop. The Smoke That Thunders.', rating: null, price: null, to: '/discover' },
+  { id: 'hotel', name: 'The Victoria Falls Hotel', x: '52%', y: '35%', category: 'Heritage Hotel', desc: 'Iconic Edwardian elegance since 1904. Views of the bridge and gorge.', rating: '★ 9.1 · 251 reviews', price: 'From $577 / night', to: '/stays/the-victoria-falls-hotel' },
+  { id: 'safari', name: 'Victoria Falls Safari Lodge', x: '68%', y: '55%', category: 'Safari Lodge', desc: 'Perched on a ridge overlooking a wildlife waterhole. 500 acres of wilderness.', rating: '★ 9.0 · 432 reviews', price: 'From $418 / night', to: '/stays/victoria-falls-safari-lodge' },
+  { id: 'bridge', name: 'Victoria Falls Bridge', x: '40%', y: '55%', category: 'Landmark', desc: 'Bungee, zip-line, and bridge tours with canyon views. Built in 1905.', rating: null, price: null, to: '/experiences' },
+  { id: 'town', name: 'Victoria Falls Town', x: '55%', y: '48%', category: 'Town Centre', desc: 'Shops, restaurants, markets, and the gateway to all activities.', rating: null, price: null, to: '/dining' },
+  { id: 'national-park', name: 'Zambezi National Park', x: '25%', y: '30%', category: 'National Park', desc: 'Wildlife-rich park stretching along the Zambezi. Big game, birdlife, and river cruises.', rating: null, price: null, to: '/experiences' },
 ];
 
 const GUIDE_DATA = [
@@ -136,9 +194,11 @@ const PROOF_DATA = [
   { quote: 'From the sunset cruise to the bush dinner under the stars — every moment was perfectly curated.', name: 'Amara & Kofi', trip: '3-Day Romantic Retreat' },
 ];
 
+/* ─── COMPONENT ─── */
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [activePin, setActivePin] = useState(MAP_PINS[0]);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide(prev => (prev + 1) % BANNER_SLIDES.length);
@@ -179,7 +239,35 @@ export default function HomePage() {
         </HeroScroll>
       </Hero>
 
-      {/* ─── 2. WHAT IS VFCALLS ONE ─── */}
+      {/* ─── 2. WHY VICTORIA FALLS ─── */}
+      <WhySection>
+        <WhyBg>
+          <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1800&q=85" alt="Victoria Falls" />
+        </WhyBg>
+        <WhyOverlay />
+        <WhyInner>
+          <WhyText>
+            <WhyLabel>Why Victoria Falls</WhyLabel>
+            <WhyTitle>A Wonder of the World,<br />A Playground for the Soul</WhyTitle>
+            <WhySubtitle>Where luxury meets wilderness</WhySubtitle>
+            <WhyDesc>
+              Victoria Falls is not just a destination — it's an experience that transforms you.
+              Where the mighty Zambezi plunges into the Batoka Gorge, nature reveals its most dramatic spectacle.
+            </WhyDesc>
+          </WhyText>
+          <WhyFeatures>
+            {WHY_FEATURES.map((f, i) => (
+              <WhyFeature key={i} initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.5,delay:i*0.1}}>
+                <WhyFeatureIcon><Icon name={f.icon} size={24} /></WhyFeatureIcon>
+                <WhyFeatureTitle>{f.title}</WhyFeatureTitle>
+                <WhyFeatureText>{f.text}</WhyFeatureText>
+              </WhyFeature>
+            ))}
+          </WhyFeatures>
+        </WhyInner>
+      </WhySection>
+
+      {/* ─── 3. WHAT IS VFCALLS ONE ─── */}
       <Section>
         <SectionHeader>
           <SectionLabel>What is VicFalls One?</SectionLabel>
@@ -207,39 +295,39 @@ export default function HomePage() {
         </motion.div>
       </Section>
 
-      {/* ─── 3. THE ECOSYSTEM ─── */}
-      <Section>
-        <SectionHeader>
-          <SectionLabel>The Ecosystem</SectionLabel>
+      {/* ─── 4. HANDPICKED STAYS ─── */}
+      <FullBleed>
+        <SectionHeader style={{padding:'0 2rem'}}>
+          <SectionLabel>Exceptional Places to Stay</SectionLabel>
           <Divider />
-          <SectionTitle>More Than a Tourism Site</SectionTitle>
-          <SectionDesc>Every part of the Victoria Falls experience, connected into one seamless platform.</SectionDesc>
+          <SectionTitle>Handpicked Properties</SectionTitle>
+          <SectionDesc>Where you rest matters. These are the stays we'd choose ourselves.</SectionDesc>
         </SectionHeader>
-        <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:'-50px'}} variants={stagger}>
-          <EcoGrid>
-            {[
-              { icon: 'sun', title: 'Experiences', tags: 'Safari · Helicopter · Rafting · Cruises' },
-              { icon: 'dining', title: 'Dining', tags: 'Restaurants · Cafes · Fine dining · Bush dinners' },
-              { icon: 'shuttle', title: 'Transport', tags: 'Airport transfers · Private drivers · Shuttles' },
-              { icon: 'pool', title: 'Stays', tags: 'Hotels · Lodges · Guest houses · Villas' },
-              { icon: 'calendar', title: 'Events', tags: 'Festivals · Conferences · Live entertainment' },
-              { icon: 'camera', title: 'Local Services', tags: 'Photography · Guides · Shopping · Wellness' },
-            ].map((e, i) => (
-              <motion.div key={i} variants={fadeUp}>
-                <EcoCard>
-                  <EcoIcon><Icon name={e.icon} size={22} /></EcoIcon>
-                  <div>
-                    <EcoTitle>{e.title}</EcoTitle>
-                    <EcoTags>{e.tags}</EcoTags>
-                  </div>
-                </EcoCard>
-              </motion.div>
-            ))}
-          </EcoGrid>
-        </motion.div>
-      </Section>
+        <StaysScroll>
+          {FEATURED_STAYS.map(s => (
+            <StayCard key={s.id} to={`/stays/${s.slug}`}>
+              <StayImg className="stayimg">
+                <img src={s.image} alt={s.name} loading="lazy" />
+                <StayBadge>{s.category}</StayBadge>
+              </StayImg>
+              <StayBody>
+                <StayCategory>{s.category}</StayCategory>
+                <StayName>{s.name}</StayName>
+                <StayMeta>
+                  <StayRating>★ {s.rating}</StayRating>
+                  <span>· {s.reviews.toLocaleString()} reviews</span>
+                </StayMeta>
+                <StayPriceRow>
+                  <StayPrice>From <span>${s.price}</span> / night</StayPrice>
+                  <StayCTA>Explore Stay →</StayCTA>
+                </StayPriceRow>
+              </StayBody>
+            </StayCard>
+          ))}
+        </StaysScroll>
+      </FullBleed>
 
-      {/* ─── 4. VISITOR PLATFORM — AUTO-SCROLLING BANNER ─── */}
+      {/* ─── 5. VISITOR PLATFORM BANNER ─── */}
       <BannerSection
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -291,7 +379,7 @@ export default function HomePage() {
         </BannerControls>
       </BannerSection>
 
-      {/* ─── 5. SIGNATURE JOURNEYS ─── */}
+      {/* ─── 6. SIGNATURE JOURNEYS ─── */}
       <FullBleed>
         <SectionHeader style={{padding:'0 2rem'}}>
           <SectionLabel>Signature Journeys</SectionLabel>
@@ -316,7 +404,66 @@ export default function HomePage() {
         </JourneyScroll>
       </FullBleed>
 
-      {/* ─── 6. GUIDES & STORIES ─── */}
+      {/* ─── 7. INTERACTIVE MAP ─── */}
+      <MapSection>
+        <MapInner>
+          <SectionHeader>
+            <SectionLabel>Explore the Region</SectionLabel>
+            <Divider />
+            <SectionTitle>Interactive Map</SectionTitle>
+            <SectionDesc>Discover key locations across Victoria Falls and the surrounding area.</SectionDesc>
+          </SectionHeader>
+          <MapLayout>
+            <MapCanvas>
+              <MapSvg>
+                <svg viewBox="0 0 600 450" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'100%'}}>
+                  <rect width="600" height="450" fill="#1F3A32"/>
+                  <path d="M0 200 Q80 180 150 220 Q220 260 300 240 Q380 220 450 250 Q520 280 600 260 L600 450 L0 450Z" fill="#2A4F43" opacity="0.5"/>
+                  <path d="M0 280 Q100 260 200 290 Q300 320 400 290 Q500 260 600 280 L600 450 L0 450Z" fill="#1F3A32" opacity="0.3"/>
+                  <path d="M280 100 Q290 150 285 200 Q280 250 290 300 Q300 350 295 400" stroke="rgba(216,195,165,0.3)" strokeWidth="3" strokeDasharray="8 4"/>
+                  <path d="M100 150 Q150 180 200 170 Q250 160 300 180 Q350 200 400 190 Q450 180 500 200" stroke="rgba(216,195,165,0.15)" strokeWidth="2"/>
+                  <circle cx="210" cy="190" r="40" fill="rgba(216,195,165,0.08)" stroke="rgba(216,195,165,0.15)" strokeWidth="1"/>
+                  <circle cx="410" cy="250" r="25" fill="rgba(216,195,165,0.06)" stroke="rgba(216,195,165,0.1)" strokeWidth="1"/>
+                  <text x="300" y="20" textAnchor="middle" fill="rgba(216,195,165,0.25)" fontSize="10" fontFamily="Inter" letterSpacing="0.15em">ZAMBEZI RIVER</text>
+                  <text x="150" y="380" textAnchor="middle" fill="rgba(216,195,165,0.15)" fontSize="9" fontFamily="Inter" letterSpacing="0.1em">ZAMBEZI NATIONAL PARK</text>
+                </svg>
+              </MapSvg>
+              {MAP_PINS.map(pin => (
+                <MapPin
+                  key={pin.id}
+                  style={{ left: pin.x, top: pin.y }}
+                  $active={activePin.id === pin.id}
+                  onClick={() => setActivePin(pin)}
+                >
+                  <MapPinLabel $active={activePin.id === pin.id}>{pin.name}</MapPinLabel>
+                </MapPin>
+              ))}
+            </MapCanvas>
+            <div>
+              <AnimatePresence mode="wait">
+                <MapInfo key={activePin.id} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.3}}>
+                  <MapInfoCategory>{activePin.category}</MapInfoCategory>
+                  <MapInfoName>{activePin.name}</MapInfoName>
+                  {activePin.rating && <MapInfoRating>{activePin.rating}</MapInfoRating>}
+                  <MapInfoDesc>{activePin.desc}</MapInfoDesc>
+                  {activePin.price && <MapInfoPrice><span>{activePin.price}</span></MapInfoPrice>}
+                  <MapInfoBtn to={activePin.to}>Explore <Icon name="arrow" size={14} /></MapInfoBtn>
+                </MapInfo>
+              </AnimatePresence>
+              <MapPinsList>
+                {MAP_PINS.map(pin => (
+                  <MapPinBtn key={pin.id} $active={activePin.id === pin.id} onClick={() => setActivePin(pin)}>
+                    <PinDot $active={activePin.id === pin.id} />
+                    {pin.name}
+                  </MapPinBtn>
+                ))}
+              </MapPinsList>
+            </div>
+          </MapLayout>
+        </MapInner>
+      </MapSection>
+
+      {/* ─── 8. GUIDES & STORIES ─── */}
       <Section>
         <SectionHeader>
           <SectionLabel>Guides & Stories</SectionLabel>
@@ -342,7 +489,7 @@ export default function HomePage() {
         </motion.div>
       </Section>
 
-      {/* ─── 7. SOCIAL PROOF ─── */}
+      {/* ─── 9. SOCIAL PROOF ─── */}
       <ProofSection>
         <ProofInner>
           <SectionHeader>
@@ -366,8 +513,12 @@ export default function HomePage() {
         </ProofInner>
       </ProofSection>
 
-      {/* ─── 8. FINAL CTA ─── */}
+      {/* ─── 10. FINAL CTA ─── */}
       <FinalCTA>
+        <FinalCTABg>
+          <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1800&q=85" alt="Victoria Falls" />
+        </FinalCTABg>
+        <FinalCTAOverlay />
         <FinalCTAContent>
           <FinalCTATitle>Your Victoria Falls Journey<br/>Starts Here</FinalCTATitle>
           <FinalCTAButtons>
