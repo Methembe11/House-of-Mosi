@@ -44,9 +44,9 @@ const HeroScroll = styled(motion.div)` position:absolute; bottom:3rem; left:50%;
 const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradient(transparent, rgba(255,255,255,0.4)); `;
 
 /* ─── WHY VICTORIA FALLS ─── */
-const WhySection = styled.section` position:relative; min-height:600px; display:flex; align-items:center; overflow:hidden; `;
-const WhyBg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; } `;
-const WhyOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(135deg, rgba(21,42,36,0.88) 0%, rgba(31,58,50,0.65) 50%, rgba(21,42,36,0.82) 100%); `;
+const WhySection = styled.section` position:relative; min-height:600px; overflow:hidden; `;
+const WhyBg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; display:block; } `;
+const WhyOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(to right, rgba(21,42,36,0.3) 0%, rgba(21,42,36,0.85) 50%, rgba(21,42,36,0.92) 100%); `;
 const WhyInner = styled.div` position:relative; z-index:2; max-width:1400px; margin:0 auto; padding:5rem 2rem; width:100%; display:flex; justify-content:flex-end; `;
 const WhyContent = styled.div` max-width:520px; color:${p=>p.theme.colors.white}; `;
 const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.25rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.champagne}; } `;
