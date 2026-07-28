@@ -33,7 +33,7 @@ const Hero = styled.section`
 `;
 const HeroContent = styled.div` text-align:center; position:relative; z-index:2; padding:0 2rem; max-width:880px; `;
 const VideoManager = styled.div` position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; `;
-const HeroVideo = styled.video` width:100%; height:100%; object-fit:cover; display:${p => p.$active ? 'block' : 'none'}; `;
+const HeroVideo = styled.video` width:100%; height:100%; object-fit:cover; display:block; `;
 const HeroLabel = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.5rem; `;
 const HeroTitle = styled(motion.h1)` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2.8rem,6.5vw,5rem); font-weight:300; color:${p=>p.theme.colors.white}; line-height:1.1; margin-bottom:1.75rem; letter-spacing:-0.01em; `;
 const HeroSub = styled(motion.p)` font-size:${p=>p.theme.fontSizes.lg}; color:rgba(255,255,255,0.6); max-width:600px; margin:0 auto 3.5rem; line-height:1.8; font-weight:300; `;
@@ -188,9 +188,8 @@ const PARTNER_DATA = [
 
 /* ─── COMPONENT ─── */
 const HERO_VIDEOS = [
-  'https://www.pexels.com/download/video/2421621/',
-  'https://www.pexels.com/download/video/37711945/',
-  'https://www.pexels.com/download/video/34773582/',
+  'https://www.pexels.com/video/2421621/download/',
+  'https://www.pexels.com/video/37711945/download/',
 ];
 
 export default function HomePage() {
@@ -198,7 +197,7 @@ export default function HomePage() {
   const [isPaused, setIsPaused] = useState(false);
   const [activePin, setActivePin] = useState(MAP_PINS[0]);
   const [currentVideo, setCurrentVideo] = useState(0);
-  const videoRefs = useRef([]);
+  const videoRef = useRef(null);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide(prev => (prev + 1) % BANNER_SLIDES.length);
@@ -222,23 +221,27 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Play video when currentVideo changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {});
+    }
+  }, [currentVideo]);
+
   return (
     <>
       {/* ─── 1. HERO ─── */}
       <Hero>
         <VideoManager>
-          {HERO_VIDEOS.map((url, i) => (
-            <HeroVideo
-              key={i}
-              ref={el => (videoRefs.current[i] = el)}
-              src={url}
-              autoPlay={i === currentVideo}
-              muted
-              loop={false}
-              playsInline
-              $active={i === currentVideo}
-            />
-          ))}
+          <HeroVideo
+            key={currentVideo}
+            ref={videoRef}
+            src={HERO_VIDEOS[currentVideo]}
+            muted
+            loop={false}
+            playsInline
+          />
         </VideoManager>
         <HeroContent>
           <HeroLabel initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.8,delay:0.3}}>
