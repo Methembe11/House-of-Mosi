@@ -45,9 +45,9 @@ const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradien
 
 /* ─── WHY VICTORIA FALLS ─── */
 const WhySection = styled.section` padding:0; `;
-const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:500px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
-const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:500px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:350px; } } `;
-const WhyContent = styled.div` display:flex; flex-direction:column; justify-content:center; padding:4rem 3.5rem; background:${p=>p.theme.colors.cream}; @media(max-width:${p=>p.theme.breakpoints.tablet}){ padding:3rem 2rem; } `;
+const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:300px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
+const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:300px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:250px; } } `;
+const WhyContent = styled.div` display:flex; flex-direction:column; justify-content:center; padding:3rem 3.5rem; background:${p=>p.theme.colors.cream}; @media(max-width:${p=>p.theme.breakpoints.tablet}){ padding:2.5rem 2rem; } `;
 const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.cocoa}; } `;
 const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:${p=>p.theme.colors.text}; line-height:1.15; margin-bottom:1.5rem; `;
 const WhyDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:${p=>p.theme.colors.textLight}; line-height:1.9; margin-bottom:2.5rem; max-width:480px; `;
