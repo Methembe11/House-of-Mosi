@@ -44,20 +44,18 @@ const HeroScroll = styled(motion.div)` position:absolute; bottom:3rem; left:50%;
 const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradient(transparent, rgba(255,255,255,0.4)); `;
 
 /* ─── WHY VICTORIA FALLS ─── */
-const WhySection = styled.section` position:relative; min-height:600px; overflow:hidden; `;
-const WhyBg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; display:block; } `;
-const WhyOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(to right, rgba(21,42,36,0.3) 0%, rgba(21,42,36,0.85) 50%, rgba(21,42,36,0.92) 100%); `;
-const WhyInner = styled.div` position:relative; z-index:2; max-width:1400px; margin:0 auto; padding:5rem 2rem; width:100%; display:flex; justify-content:flex-end; `;
-const WhyContent = styled.div` max-width:520px; color:${p=>p.theme.colors.white}; `;
-const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.25rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.champagne}; } `;
-const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4vw,3.25rem); font-weight:300; line-height:1.15; margin-bottom:1rem; `;
-const WhySubtitle = styled.p` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; font-weight:300; color:${p=>p.theme.colors.champagne}; font-style:italic; margin-bottom:1.5rem; line-height:1.5; `;
-const WhyDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:rgba(255,255,255,0.7); line-height:1.9; max-width:520px; `;
+const WhySection = styled.section` padding:0; `;
+const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:500px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
+const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:500px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:350px; } } `;
+const WhyContent = styled.div` display:flex; flex-direction:column; justify-content:center; padding:4rem 3.5rem; background:${p=>p.theme.colors.cream}; @media(max-width:${p=>p.theme.breakpoints.tablet}){ padding:3rem 2rem; } `;
+const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.cocoa}; } `;
+const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:${p=>p.theme.colors.text}; line-height:1.15; margin-bottom:1.5rem; `;
+const WhyDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:${p=>p.theme.colors.textLight}; line-height:1.9; margin-bottom:2.5rem; max-width:480px; `;
 const WhyList = styled.div` display:flex; flex-direction:column; gap:1.25rem; `;
-const WhyItem = styled(motion.div)` display:flex; gap:1.25rem; align-items:flex-start; padding:1.25rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); transition:all 0.3s; &:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.15); } `;
-const WhyItemIcon = styled.div` flex-shrink:0; width:44px; height:44px; background:rgba(216,195,165,0.15); color:${p=>p.theme.colors.champagne}; display:flex; align-items:center; justify-content:center; border-radius:50%; `;
-const WhyItemTitle = styled.h4` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.lg}; font-weight:500; color:${p=>p.theme.colors.white}; margin-bottom:0.2rem; `;
-const WhyItemText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:rgba(255,255,255,0.6); line-height:1.6; `;
+const WhyItem = styled(motion.div)` display:flex; gap:1.25rem; align-items:flex-start; `;
+const WhyItemIcon = styled.div` flex-shrink:0; width:44px; height:44px; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.3s; ${WhyItem}:hover &{ background:${p=>p.theme.colors.cocoa}; } `;
+const WhyItemTitle = styled.h4` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.lg}; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.15rem; `;
+const WhyItemText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; line-height:1.6; `;
 
 /* ─── VALUE PROPS ─── */
 const ValueGrid = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; @media(max-width:${p=>p.theme.breakpoints.desktop}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
@@ -241,18 +239,17 @@ export default function HomePage() {
 
       {/* ─── 2. WHY VICTORIA FALLS ─── */}
       <WhySection>
-        <WhyBg>
-          <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1800&q=85" alt="Victoria Falls" />
-        </WhyBg>
-        <WhyOverlay />
-        <WhyInner>
+        <WhyGrid>
+          <WhyImage>
+            <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&q=85" alt="Victoria Falls" />
+          </WhyImage>
           <WhyContent>
             <WhyLabel>Why Victoria Falls</WhyLabel>
             <WhyTitle>A Wonder of the World,<br />A Playground for the Soul</WhyTitle>
-            <WhySubtitle>Where luxury meets wilderness</WhySubtitle>
             <WhyDesc>
               Victoria Falls is not just a destination — it's an experience that transforms you.
               Where the mighty Zambezi plunges into the Batoka Gorge, nature reveals its most dramatic spectacle.
+              This is where luxury meets wilderness.
             </WhyDesc>
             <WhyList>
               {WHY_FEATURES.map((f, i) => (
@@ -266,7 +263,7 @@ export default function HomePage() {
               ))}
             </WhyList>
           </WhyContent>
-        </WhyInner>
+        </WhyGrid>
       </WhySection>
 
       {/* ─── 3. WHAT IS VFCALLS ONE ─── */}
