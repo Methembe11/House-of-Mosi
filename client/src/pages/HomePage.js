@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,11 +25,6 @@ const Hero = styled.section`
   height: 100vh; min-height: 750px; display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
   background: ${p => p.theme.colors.primaryDark};
-  &::before {
-    content:''; position:absolute; inset:0;
-    background: url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&q=85') center/cover no-repeat;
-    z-index:0;
-  }
   &::after {
     content:''; position:absolute; inset:0;
     background: linear-gradient(135deg, rgba(21,42,36,0.7) 0%, rgba(31,58,50,0.45) 40%, rgba(21,42,36,0.65) 100%);
@@ -37,6 +32,8 @@ const Hero = styled.section`
   }
 `;
 const HeroContent = styled.div` text-align:center; position:relative; z-index:2; padding:0 2rem; max-width:880px; `;
+const VideoManager = styled.div` position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; `;
+const HeroVideo = styled.video` width:100%; height:100%; object-fit:cover; display:${p => p.$active ? 'block' : 'none'}; `;
 const HeroLabel = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.5rem; `;
 const HeroTitle = styled(motion.h1)` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2.8rem,6.5vw,5rem); font-weight:300; color:${p=>p.theme.colors.white}; line-height:1.1; margin-bottom:1.75rem; letter-spacing:-0.01em; `;
 const HeroSub = styled(motion.p)` font-size:${p=>p.theme.fontSizes.lg}; color:rgba(255,255,255,0.6); max-width:600px; margin:0 auto 3.5rem; line-height:1.8; font-weight:300; `;
@@ -190,10 +187,18 @@ const PARTNER_DATA = [
 ];
 
 /* ─── COMPONENT ─── */
+const HERO_VIDEOS = [
+  'https://www.pexels.com/download/video/2421621/',
+  'https://www.pexels.com/download/video/37711945/',
+  'https://www.pexels.com/download/video/34773582/',
+];
+
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [activePin, setActivePin] = useState(MAP_PINS[0]);
+  const [currentVideo, setCurrentVideo] = useState(0);
+  const videoRefs = useRef([]);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide(prev => (prev + 1) % BANNER_SLIDES.length);
@@ -209,10 +214,32 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, [isPaused, nextSlide]);
 
+  // Video cycling effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentVideo(prev => (prev + 1) % HERO_VIDEOS.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
       {/* ─── 1. HERO ─── */}
       <Hero>
+        <VideoManager>
+          {HERO_VIDEOS.map((url, i) => (
+            <HeroVideo
+              key={i}
+              ref={el => (videoRefs.current[i] = el)}
+              src={url}
+              autoPlay={i === currentVideo}
+              muted
+              loop={false}
+              playsInline
+              $active={i === currentVideo}
+            />
+          ))}
+        </VideoManager>
         <HeroContent>
           <HeroLabel initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.8,delay:0.3}}>
             Victoria Falls, Zimbabwe
