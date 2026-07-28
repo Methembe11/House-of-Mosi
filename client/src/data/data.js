@@ -931,6 +931,39 @@ export const signatureJourneys = [
       'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80'
     ],
     featured: true
+  },
+  {
+    id: 'journey-4',
+    name: 'The Family Discovery',
+    slug: 'family-discovery',
+    tagline: 'An unforgettable adventure for the whole family',
+    description: 'A thoughtfully designed family itinerary combining wildlife, adventure, and cultural experiences. Kid-friendly activities, comfortable lodges, and memories the whole family will treasure.',
+    duration: '5 Days / 4 Nights',
+    priceFrom: 3800,
+    priceUnit: 'per person',
+    accommodation: 'Ilala Lodge Hotel (Family Room)',
+    includes: [
+      '4 nights family accommodation',
+      'Full board',
+      'Guided family safari',
+      'Junior ranger programme',
+      'Sunset cruise',
+      'Cultural village visit',
+      'Rainforest walk',
+      'Airport transfers'
+    ],
+    itinerary: [
+      { day: 1, title: 'Welcome to the Falls', description: 'Arrive and settle into Ilala Lodge. Afternoon orientation walk through Victoria Falls Town. Evening family dinner at the lodge.' },
+      { day: 2, title: 'The Mighty Falls', description: 'Morning family guided tour of Victoria Falls. Afternoon splash pool time. Evening sunset cruise with snacks and drinks.' },
+      { day: 3, title: 'Wildlife Safari', description: 'Full day family safari in Zambezi National Park with picnic lunch. Kids participate in the junior ranger programme.' },
+      { day: 4, title: 'Culture & Adventure', description: 'Morning cultural village visit and traditional cooking class. Afternoon family rainforest walk. Farewell dinner.' },
+      { day: 5, title: 'Farewell', description: 'Leisurely breakfast. Morning at the pool. Airport transfer for departure.' }
+    ],
+    images: [
+      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80'
+    ],
+    featured: true
   }
 ];
 
