@@ -47,8 +47,8 @@ const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradien
 const WhySection = styled.section` position:relative; min-height:600px; display:flex; align-items:center; overflow:hidden; `;
 const WhyBg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; } `;
 const WhyOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(135deg, rgba(21,42,36,0.88) 0%, rgba(31,58,50,0.65) 50%, rgba(21,42,36,0.82) 100%); `;
-const WhyInner = styled.div` position:relative; z-index:2; max-width:1400px; margin:0 auto; padding:5rem 2rem; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; gap:2.5rem; } `;
-const WhyText = styled.div` color:${p=>p.theme.colors.white}; `;
+const WhyInner = styled.div` position:relative; z-index:2; max-width:1400px; margin:0 auto; padding:5rem 2rem; width:100%; display:flex; justify-content:flex-end; `;
+const WhyContent = styled.div` max-width:520px; color:${p=>p.theme.colors.white}; `;
 const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.25rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.champagne}; } `;
 const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4vw,3.25rem); font-weight:300; line-height:1.15; margin-bottom:1rem; `;
 const WhySubtitle = styled.p` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; font-weight:300; color:${p=>p.theme.colors.champagne}; font-style:italic; margin-bottom:1.5rem; line-height:1.5; `;
@@ -246,7 +246,7 @@ export default function HomePage() {
         </WhyBg>
         <WhyOverlay />
         <WhyInner>
-          <WhyText>
+          <WhyContent>
             <WhyLabel>Why Victoria Falls</WhyLabel>
             <WhyTitle>A Wonder of the World,<br />A Playground for the Soul</WhyTitle>
             <WhySubtitle>Where luxury meets wilderness</WhySubtitle>
@@ -254,18 +254,18 @@ export default function HomePage() {
               Victoria Falls is not just a destination — it's an experience that transforms you.
               Where the mighty Zambezi plunges into the Batoka Gorge, nature reveals its most dramatic spectacle.
             </WhyDesc>
-          </WhyText>
-          <WhyList>
-            {WHY_FEATURES.map((f, i) => (
-              <WhyItem key={i} initial={{opacity:0,x:20}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.5,delay:i*0.1}}>
-                <WhyItemIcon><Icon name={f.icon} size={20} /></WhyItemIcon>
-                <div>
-                  <WhyItemTitle>{f.title}</WhyItemTitle>
-                  <WhyItemText>{f.text}</WhyItemText>
-                </div>
-              </WhyItem>
-            ))}
-          </WhyList>
+            <WhyList>
+              {WHY_FEATURES.map((f, i) => (
+                <WhyItem key={i} initial={{opacity:0,x:20}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.5,delay:i*0.1}}>
+                  <WhyItemIcon><Icon name={f.icon} size={20} /></WhyItemIcon>
+                  <div>
+                    <WhyItemTitle>{f.title}</WhyItemTitle>
+                    <WhyItemText>{f.text}</WhyItemText>
+                  </div>
+                </WhyItem>
+              ))}
+            </WhyList>
+          </WhyContent>
         </WhyInner>
       </WhySection>
 
