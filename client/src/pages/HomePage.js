@@ -92,8 +92,8 @@ const PlatformIconStrip = styled.div` position:absolute; bottom:6rem; left:0; ri
 const PlatformIconItem = styled(Link)` display:flex; flex-direction:column; align-items:center; gap:0.5rem; color:rgba(255,255,255,0.8); text-decoration:none; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.3s; &:hover{ color:${p=>p.theme.colors.champagne}; } ${p=>p.$active && css` color:${p=>p.theme.colors.champagne}; `} `;
 
 /* ─── JOURNEYS ─── */
-const JourneyScroll = styled.div` display:flex; gap:2rem; padding:0 2rem; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; &::-webkit-scrollbar{display:none;} `;
-const JourneyCard = styled(Link)` flex:0 0 360px; scroll-snap-align:start; position:relative; height:480px; overflow:hidden; display:block; border-radius:2px; text-decoration:none; &:hover .jimg img{transform:scale(1.06);} &:hover .joverlay{opacity:1;} `;
+const JourneyScroll = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; padding:0 2rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
+const JourneyCard = styled(Link)` position:relative; height:480px; overflow:hidden; display:block; border-radius:2px; text-decoration:none; &:hover .jimg img{transform:scale(1.06);} &:hover .joverlay{opacity:1;}`;
 const JImg = styled.div` position:absolute; inset:0; background:${p=>p.theme.colors.primary}; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.7s cubic-bezier(0.22,1,0.36,1); } `;
 const JOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(transparent 35%, rgba(21,42,36,0.93)); display:flex; flex-direction:column; justify-content:flex-end; padding:2.5rem; transition:opacity 0.3s; `;
 const JTag = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.25em; color:${p=>p.theme.colors.champagne}; margin-bottom:0.5rem; font-weight:500; `;
