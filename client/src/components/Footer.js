@@ -2,79 +2,120 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-const FooterWrapper = styled.footer`
-  background: ${props => props.theme.colors.primary};
+const Wrapper = styled.footer`
+  background: ${props => props.theme.colors.backgroundDark};
   color: ${props => props.theme.colors.white};
-  padding: 5rem 2rem 2rem;
+  padding: 5rem 0 2rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, ${props => props.theme.colors.accent}, transparent);
+    opacity: 0.4;
+  }
 `;
 
-const FooterInner = styled.div`
-  max-width: 1320px;
+const Inner = styled.div`
+  max-width: ${props => props.theme.maxWidth};
   margin: 0 auto;
+  padding: 0 ${props => props.theme.spacing.gutter};
 `;
 
-const FooterGrid = styled.div`
+const Top = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
   gap: 3rem;
-  margin-bottom: 4rem;
+  padding-bottom: 4rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    grid-template-columns: 1fr 1fr;
+  @media (max-width: ${props => props.theme.breakpoints.desktop}) {
+    grid-template-columns: 1fr 1fr 1fr;
   }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     grid-template-columns: 1fr;
+    gap: 2.5rem;
   }
 `;
 
 const Brand = styled.div`
   h3 {
     font-family: ${props => props.theme.fonts.serif};
-    font-size: ${props => props.theme.fontSizes.xxl};
-    color: ${props => props.theme.colors.white};
-    margin-bottom: 1rem;
+    font-size: 1.8rem;
     font-weight: 400;
+    color: ${props => props.theme.colors.white};
+    margin-bottom: 0.4rem;
 
-    span { font-style: italic; font-weight: 300; }
+    em {
+      font-style: normal;
+      font-family: ${props => props.theme.fonts.mono};
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: ${props => props.theme.colors.accent};
+      margin-left: 0.4rem;
+    }
   }
 
   p {
     font-size: ${props => props.theme.fontSizes.sm};
-    line-height: 1.8;
-    opacity: 0.7;
-    max-width: 320px;
+    color: rgba(250, 248, 243, 0.55);
+    line-height: 1.9;
+    max-width: 340px;
+    margin-bottom: 1.5rem;
+  }
+`;
+
+const Tag = styled.div`
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: ${props => props.theme.colors.accent};
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+
+  &::before {
+    content: '';
+    width: 2rem;
+    height: 1px;
+    background: ${props => props.theme.colors.accent};
+    opacity: 0.6;
   }
 `;
 
 const Column = styled.div`
   h4 {
-    font-family: ${props => props.theme.fonts.sans};
-    font-size: ${props => props.theme.fontSizes.xs};
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    color: ${props => props.theme.colors.accent};
     margin-bottom: 1.5rem;
-    color: ${props => props.theme.colors.champagne};
-    font-weight: 600;
   }
 
   a {
     display: block;
     font-size: ${props => props.theme.fontSizes.sm};
-    opacity: 0.7;
-    margin-bottom: 0.75rem;
-    transition: opacity 0.3s ease;
+    color: rgba(250, 248, 243, 0.6);
+    margin-bottom: 0.8rem;
+    transition: all ${props => props.theme.transitions.fast};
 
-    &:hover { opacity: 1; }
+    &:hover {
+      color: ${props => props.theme.colors.white};
+      padding-left: 4px;
+    }
   }
 `;
 
-const Divider = styled.div`
-  height: 1px;
-  background: rgba(255,255,255,0.1);
-  margin-bottom: 2rem;
-`;
-
 const Bottom = styled.div`
+  border-top: 1px solid rgba(250, 248, 243, 0.08);
+  padding-top: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,65 +123,80 @@ const Bottom = styled.div`
   gap: 1rem;
 
   p {
-    font-size: ${props => props.theme.fontSizes.xs};
-    opacity: 0.5;
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(250, 248, 243, 0.35);
+    text-transform: uppercase;
   }
 `;
 
 const Regions = styled.div`
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap;
 
   span {
-    font-size: ${props => props.theme.fontSizes.xs};
-    opacity: 0.5;
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(250, 248, 243, 0.35);
   }
 `;
 
 export default function Footer() {
   return (
-    <FooterWrapper>
-      <FooterInner>
-        <FooterGrid>
+    <Wrapper>
+      <Inner>
+        <Top>
           <Brand>
-            <h3>VicFalls <span>One</span></h3>
+            <h3>VicFalls<em>One</em></h3>
+            <Tag>The Digital Operating System of Victoria Falls</Tag>
             <p>
-              The all-in-one platform for Victoria Falls. We connect
-              travelers with the destination's finest experiences, stays, dining, and transport.
+              One platform for the entire destination — where to stay, what to do, what's on,
+              how to move, and who to call. Plan a journey, run a business, or discover the
+              Smoke That Thunders.
             </p>
           </Brand>
 
           <Column>
-            <h4>Explore</h4>
-            <Link to="/discover">Discover</Link>
-            <Link to="/experiences">Experiences</Link>
-            <Link to="/dining">Dining</Link>
-            <Link to="/transport">Transport</Link>
-            <Link to="/events">Events</Link>
-            <Link to="/plan">Trip Planner</Link>
-          </Column>
-
-          <Column>
-            <h4>Areas</h4>
-            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', margin: '0 0 0.75rem', lineHeight: 1.6 }}>
-              Victoria Falls Town · Zambezi Riverfront · Rainforest Vicinity · Batoka Gorge · Wildlife Corridor · Zambezi National Park
-            </p>
-            <Link to="/destinations">Explore All Areas →</Link>
-          </Column>
-
-          <Column>
-            <h4>Platform</h4>
+            <h4>Plan</h4>
+            <Link to="/visit">Visitor Guide</Link>
+            <Link to="/plan">Plan a Journey</Link>
             <Link to="/collection">Your Collection</Link>
-            <Link to="/plan">Trip Planner</Link>
+            <Link to="/events">What's On</Link>
+            <Link to="/journal">Local Guides</Link>
+          </Column>
+
+          <Column>
+            <h4>Explore</h4>
+            <Link to="/stays">Stay</Link>
+            <Link to="/experiences">Experience</Link>
+            <Link to="/dining">Eat</Link>
+            <Link to="/transport">Move</Link>
+            <Link to="/destinations">Areas & Maps</Link>
+          </Column>
+
+          <Column>
+            <h4>Discover</h4>
+            <Link to="/discover">The Destination</Link>
+            <Link to="/discover">History & Culture</Link>
+            <Link to="/discover">Wildlife & Seasons</Link>
+            <Link to="/journal">Travel Guides</Link>
+            <Link to="/about">About Us</Link>
+          </Column>
+
+          <Column>
+            <h4>Business</h4>
             <Link to="/business">Business Portal</Link>
             <Link to="/dashboard">Tourism Dashboard</Link>
+            <Link to="/contact">Contact Us</Link>
+            <Link to="/auth">Sign In</Link>
           </Column>
-        </FooterGrid>
-
-        <Divider />
+        </Top>
 
         <Bottom>
-          <p>&copy; 2026 VicFalls One by House of Mosi. All rights reserved.</p>
+          <p>&copy; 2026 VicFalls One. The digital front door to Victoria Falls.</p>
           <Regions>
             <span>Zimbabwe</span>
             <span>Zambia</span>
@@ -149,7 +205,7 @@ export default function Footer() {
             <span>South Africa</span>
           </Regions>
         </Bottom>
-      </FooterInner>
-    </FooterWrapper>
+      </Inner>
+    </Wrapper>
   );
 }

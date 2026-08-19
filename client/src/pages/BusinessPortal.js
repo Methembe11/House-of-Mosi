@@ -1,57 +1,285 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import Icon from '../components/Icon';
 
-const PageWrapper = styled.div` padding-top: 90px; min-height: 100vh; display: flex; background: ${p => p.theme.colors.background}; `;
+const PageWrapper = styled.div`
+  padding-top: 90px;
+  min-height: 100vh;
+  display: flex;
+  background: ${p => p.theme.colors.ivory};
+`;
 
 const Sidebar = styled.aside`
-  width: 260px; background: ${p => p.theme.colors.primary}; color: ${p => p.theme.colors.white};
-  padding: 2rem 0; display: flex; flex-direction: column; position: fixed; top: 90px; bottom: 0; left: 0; z-index: 50;
-  @media(max-width: ${p => p.theme.breakpoints.tablet}) { display: ${p => p.$mobileOpen ? 'flex' : 'none'}; width: 100%; }
+  width: 270px;
+  background: ${p => p.theme.colors.backgroundDark};
+  color: ${p => p.theme.colors.white};
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 90px;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+
+  @media (max-width: ${p => p.theme.breakpoints.tablet}) {
+    display: ${p => p.$mobileOpen ? 'flex' : 'none'};
+    width: 100%;
+  }
 `;
 
-const SidebarLogo = styled.div` padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); h3 { font-family: ${p => p.theme.fonts.serif}; font-size: ${p => p.theme.fontSizes.lg}; font-weight: 400; } span { color: ${p => p.theme.colors.champagne}; } `;
+const SidebarLogo = styled.div`
+  padding: 0 1.75rem 2rem;
+  border-bottom: 1px solid rgba(203, 184, 157, 0.2);
 
-const SidebarNav = styled.nav` flex: 1; padding: 1rem 0; `;
+  h3 {
+    font-family: ${p => p.theme.fonts.serif};
+    font-size: ${p => p.theme.fontSizes.xl};
+    font-weight: 300;
+    margin-bottom: 0.35rem;
+  }
+
+  span { color: ${p => p.theme.colors.accent}; font-style: italic; }
+
+  .tag {
+    font-family: ${p => p.theme.fonts.mono};
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: ${p => p.theme.colors.textLight};
+  }
+`;
+
+const SidebarNav = styled.nav`
+  flex: 1;
+  padding: 1.25rem 0;
+`;
 
 const SidebarItem = styled.button`
-  width: 100%; text-align: left; padding: 0.75rem 1.5rem; background: ${p => p.$active ? 'rgba(255,255,255,0.1)' : 'transparent'};
-  color: ${p => p.$active ? p.theme.colors.champagne : 'rgba(255,255,255,0.7)'}; border: none; cursor: pointer;
-  font-size: ${p => p.theme.fontSizes.sm}; font-family: ${p => p.theme.fonts.sans}; display: flex; align-items: center; gap: 0.75rem;
-  transition: all 0.2s; border-left: 3px solid ${p => p.$active ? p.theme.colors.champagne : 'transparent'};
-  &:hover { background: rgba(255,255,255,0.05); color: ${p => p.theme.colors.white}; }
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem 1.75rem;
+  background: ${p => p.$active ? 'rgba(203,184,157,0.12)' : 'transparent'};
+  color: ${p => p.$active ? p.theme.colors.accent : 'rgba(250,248,243,0.65)'};
+  border: none;
+  cursor: pointer;
+  font-size: ${p => p.theme.fontSizes.sm};
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.25s;
+  border-left: 2px solid ${p => p.$active ? p.theme.colors.accent : 'transparent'};
+
+  svg { width: 16px; height: 16px; opacity: 0.8; }
+
+  &:hover { background: rgba(203,184,157,0.07); color: ${p => p.theme.colors.white}; }
 `;
 
-const Main = styled.main` flex: 1; margin-left: 260px; padding: 2rem; @media(max-width: ${p => p.theme.breakpoints.tablet}) { margin-left: 0; } `;
+const Main = styled.main`
+  flex: 1;
+  margin-left: 270px;
+  padding: 2.5rem 3rem;
+
+  @media (max-width: ${p => p.theme.breakpoints.tablet}) { margin-left: 0; }
+`;
 
 const MobileToggle = styled.button`
-  display: none; position: fixed; top: 95px; left: 1rem; z-index: 60; padding: 0.5rem 0.75rem;
-  background: ${p => p.theme.colors.primary}; color: ${p => p.theme.colors.white}; border: none; cursor: pointer; font-size: 1.25rem;
-  @media(max-width: ${p => p.theme.breakpoints.tablet}) { display: block; }
+  display: none;
+  position: fixed;
+  top: 100px;
+  left: 1rem;
+  z-index: 60;
+  padding: 0.5rem 0.8rem;
+  background: ${p => p.theme.colors.text};
+  color: ${p => p.theme.colors.white};
+  border: 1px solid ${p => p.theme.colors.accent};
+  font-size: 1.25rem;
+
+  @media (max-width: ${p => p.theme.breakpoints.tablet}) { display: block; }
 `;
 
-const PageHeader = styled.div` margin-bottom: 2rem; h1 { font-family: ${p => p.theme.fonts.serif}; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; color: ${p => p.theme.colors.text}; } p { font-size: ${p => p.theme.fontSizes.md}; color: ${p => p.theme.colors.textMuted}; margin-top: 0.25rem; } `;
+const PageHeader = styled.div`
+  margin-bottom: 2.25rem;
 
-const StatsGrid = styled.div` display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; @media(max-width: ${p => p.theme.breakpoints.desktop}) { grid-template-columns: repeat(2, 1fr); } @media(max-width: ${p => p.theme.breakpoints.mobile}) { grid-template-columns: 1fr; } `;
+  .eyebrow {
+    font-family: ${p => p.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: ${p => p.theme.colors.accentDeep};
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
 
-const StatCard = styled.div` background: ${p => p.theme.colors.white}; padding: 1.5rem; border: 1px solid ${p => p.theme.colors.border}; .label { font-size: ${p => p.theme.fontSizes.xs}; text-transform: uppercase; letter-spacing: 0.1em; color: ${p => p.theme.colors.textMuted}; margin-bottom: 0.5rem; } .value { font-family: ${p => p.theme.fonts.serif}; font-size: 2rem; font-weight: 500; color: ${p => p.theme.colors.text}; } .change { font-size: ${p => p.theme.fontSizes.sm}; color: ${p => p.theme.colors.success}; margin-top: 0.25rem; } `;
+    &::before {
+      content: '';
+      width: 2.25rem;
+      height: 1px;
+      background: ${p => p.theme.colors.accent};
+    }
+  }
 
-const TableContainer = styled.div` background: ${p => p.theme.colors.white}; border: 1px solid ${p => p.theme.colors.border}; margin-bottom: 2rem; `;
+  h1 {
+    font-family: ${p => p.theme.fonts.serif};
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 300;
+    color: ${p => p.theme.colors.text};
+    margin-bottom: 0.4rem;
+  }
 
-const TableHeader = styled.div` padding: 1.25rem 1.5rem; border-bottom: 1px solid ${p => p.theme.colors.border}; display: flex; justify-content: space-between; align-items: center; h3 { font-family: ${p => p.theme.fonts.serif}; font-size: ${p => p.theme.fontSizes.xl}; font-weight: 500; } `;
+  p {
+    font-size: ${p => p.theme.fontSizes.md};
+    color: ${p => p.theme.colors.textLight};
+  }
+`;
 
-const Table = styled.table` width: 100%; border-collapse: collapse; `;
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2.25rem;
 
-const Th = styled.th` text-align: left; padding: 0.75rem 1.5rem; font-size: ${p => p.theme.fontSizes.xs}; text-transform: uppercase; letter-spacing: 0.1em; color: ${p => p.theme.colors.textMuted}; border-bottom: 1px solid ${p => p.theme.colors.border}; font-weight: 500; `;
+  @media (max-width: ${p => p.theme.breakpoints.desktop}) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: ${p => p.theme.breakpoints.mobile}) { grid-template-columns: 1fr; }
+`;
 
-const Td = styled.td` padding: 0.85rem 1.5rem; font-size: ${p => p.theme.fontSizes.sm}; color: ${p => p.theme.colors.text}; border-bottom: 1px solid ${p => p.theme.colors.borderLight}; `;
+const StatCard = styled.div`
+  background: ${p => p.theme.colors.white};
+  padding: 1.6rem;
+  border: 1px solid ${p => p.theme.colors.borderLight};
+  border-top: 2px solid ${p => p.theme.colors.accent};
 
-const StatusBadge = styled.span` display: inline-block; padding: 0.2rem 0.6rem; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; background: ${p => p.$status === 'confirmed' ? '#e8f5e9' : p.$status === 'pending' ? '#fff3e0' : '#fce4ec'}; color: ${p => p.$status === 'confirmed' ? '#2d6a4f' : p.$status === 'pending' ? '#e65100' : '#9b2226'}; `;
+  .label {
+    font-family: ${p => p.theme.fonts.mono};
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: ${p => p.theme.colors.textLight};
+    margin-bottom: 0.75rem;
+  }
 
-const QuickActions = styled.div` display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; @media(max-width: ${p => p.theme.breakpoints.tablet}) { grid-template-columns: 1fr; } `;
+  .value {
+    font-family: ${p => p.theme.fonts.serif};
+    font-size: 2.1rem;
+    font-weight: 300;
+    color: ${p => p.theme.colors.text};
+    margin-bottom: 0.35rem;
+  }
 
-const ActionCard = styled.button` padding: 1.25rem; background: ${p => p.theme.colors.white}; border: 1px solid ${p => p.theme.colors.border}; cursor: pointer; text-align: left; transition: all 0.3s; &:hover { border-color: ${p => p.theme.colors.primary}; box-shadow: ${p => p.theme.shadows.md}; } .title { font-size: ${p => p.theme.fontSizes.md}; font-weight: 600; color: ${p => p.theme.colors.text}; margin-bottom: 0.25rem; } .desc { font-size: ${p => p.theme.fontSizes.sm}; color: ${p => p.theme.colors.textMuted}; } `;
+  .change {
+    font-family: ${p => p.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: ${p => p.theme.colors.identity};
+  }
+`;
+
+const QuickActions = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.25rem;
+
+  @media (max-width: ${p => p.theme.breakpoints.tablet}) { grid-template-columns: 1fr; }
+`;
+
+const ActionCard = styled.button`
+  padding: 1.5rem;
+  background: ${p => p.theme.colors.white};
+  border: 1px solid ${p => p.theme.colors.borderLight};
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: ${p => p.theme.colors.accent};
+    box-shadow: ${p => p.theme.shadows.md};
+    transform: translateY(-2px);
+  }
+
+  .title {
+    font-family: ${p => p.theme.fonts.serif};
+    font-size: 1.25rem;
+    color: ${p => p.theme.colors.text};
+    margin-bottom: 0.4rem;
+  }
+
+  .desc {
+    font-size: ${p => p.theme.fontSizes.sm};
+    color: ${p => p.theme.colors.textLight};
+    line-height: 1.55;
+  }
+`;
+
+const TableContainer = styled.div`
+  background: ${p => p.theme.colors.white};
+  border: 1px solid ${p => p.theme.colors.borderLight};
+  margin-bottom: 2.5rem;
+`;
+
+const TableHeader = styled.div`
+  padding: 1.35rem 1.75rem;
+  border-bottom: 1px solid ${p => p.theme.colors.border};
+
+  h3 {
+    font-family: ${p => p.theme.fonts.serif};
+    font-size: 1.6rem;
+    font-weight: 300;
+  }
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+`;
+
+const Th = styled.th`
+  text-align: left;
+  padding: 0.85rem 1.75rem;
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: ${p => p.theme.colors.textLight};
+  border-bottom: 1px solid ${p => p.theme.colors.border};
+  font-weight: 400;
+`;
+
+const Td = styled.td`
+  padding: 1rem 1.75rem;
+  font-size: ${p => p.theme.fontSizes.sm};
+  color: ${p => p.theme.colors.text};
+  border-bottom: 1px solid ${p => p.theme.colors.borderLight};
+`;
+
+const StatusBadge = styled.span`
+  display: inline-block;
+  padding: 0.28rem 0.7rem;
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: ${p => p.$status === 'confirmed' ? 'rgba(70,88,74,0.12)' : p.$status === 'pending' ? 'rgba(203,184,157,0.25)' : 'rgba(155,34,38,0.1)'};
+  color: ${p => p.$status === 'confirmed' ? p.theme.colors.identity : p.$status === 'pending' ? '#8A6D3B' : '#9B2226'};
+`;
 
 const MENU = ['Dashboard', 'Bookings', 'Customers', 'Listings', 'Analytics', 'Reviews', 'Settings'];
+
+const MENU_ICONS = {
+  Dashboard: 'chart',
+  Bookings: 'calendar',
+  Customers: 'users',
+  Listings: 'building',
+  Analytics: 'chart',
+  Reviews: 'star',
+  Settings: 'settings',
+};
 
 const BOOKINGS = [
   { id: 'B-2847', guest: 'Sarah Mitchell', stay: 'Victoria Falls Hotel', dates: 'Jul 15-18', amount: '$2,250', status: 'confirmed' },
@@ -69,10 +297,14 @@ export default function BusinessPortal() {
     <PageWrapper>
       <MobileToggle onClick={() => setMobileOpen(!mobileOpen)}>&#9776;</MobileToggle>
       <Sidebar $mobileOpen={mobileOpen}>
-        <SidebarLogo><h3>VicFalls One <span>Business</span></h3></SidebarLogo>
+        <SidebarLogo>
+          <h3>VicFalls One <span>Business</span></h3>
+          <div className="tag">Partner Command</div>
+        </SidebarLogo>
         <SidebarNav>
           {MENU.map(item => (
             <SidebarItem key={item} $active={active === item} onClick={() => { setActive(item); setMobileOpen(false); }}>
+              <Icon name={MENU_ICONS[item]} />
               {item}
             </SidebarItem>
           ))}
@@ -81,6 +313,7 @@ export default function BusinessPortal() {
 
       <Main>
         <PageHeader>
+          <div className="eyebrow">Partner Command · Module 07</div>
           <h1>Dashboard</h1>
           <p>Welcome back. Here's what's happening with your business.</p>
         </PageHeader>

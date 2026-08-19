@@ -5,6 +5,7 @@ import GlobalStyles, { theme } from './styles/GlobalStyles';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import VisitPage from './pages/VisitPage';
 import DiscoverPage from './pages/DiscoverPage';
 import StaysPage from './pages/StaysPage';
 import AccommodationDetailPage from './pages/AccommodationDetailPage';
@@ -43,6 +44,7 @@ function AppContent() {
       <Navbar collectionCount={collection.length} />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/visit" element={<VisitPage />} />
         <Route path="/discover" element={<DiscoverPage isInCollection={isInCollection} toggleCollection={toggleCollection} />} />
         <Route path="/stays" element={<StaysPage isInCollection={isInCollection} toggleCollection={toggleCollection} />} />
         <Route path="/stays/:slug" element={<AccommodationDetailPage isInCollection={isInCollection} toggleCollection={toggleCollection} />} />

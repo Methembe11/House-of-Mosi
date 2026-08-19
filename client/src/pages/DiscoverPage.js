@@ -2,126 +2,113 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { PageHero, Container } from '../components/ui';
 import { accommodations, experiences, restaurants } from '../data/data';
 
-const PageWrapper = styled.div`padding-top: 90px;`;
+const SearchBar = styled.div`
+  max-width: 560px;
+  margin: 2.25rem auto 0;
+  position: relative;
 
-const HeroSection = styled.div`
-  background: ${props => props.theme.colors.primary};
-  padding: 4rem 2rem;
-  text-align: center;
+  input {
+    width: 100%;
+    padding: 1.1rem 1.6rem;
+    background: rgba(250, 248, 243, 0.12);
+    border: 1px solid rgba(250, 248, 243, 0.28);
+    color: ${props => props.theme.colors.white};
+    font-size: 1rem;
+    font-family: ${props => props.theme.fonts.sans};
+    backdrop-filter: blur(6px);
+
+    &::placeholder { color: rgba(250, 248, 243, 0.55); font-style: italic; }
+    &:focus { outline: none; border-color: ${props => props.theme.colors.accent}; background: rgba(250, 248, 243, 0.16); }
+  }
 `;
 
-const HeroTitle = styled.h1`
-  font-family: ${props => props.theme.fonts.serif};
-  font-size: clamp(2rem, 4vw, 3rem);
-  color: ${props => props.theme.colors.white};
-  font-weight: 400;
-  margin-bottom: 0.75rem;
-`;
-
-const HeroSub = styled.p`
-  font-size: ${props => props.theme.fontSizes.md};
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 2rem;
-`;
-
-const SearchContainer = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 1rem 1.5rem;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: ${props => props.theme.colors.white};
-  font-size: ${props => props.theme.fontSizes.md};
-  font-family: ${props => props.theme.fonts.sans};
-
-  &::placeholder { color: rgba(255,255,255,0.5); }
-  &:focus { outline: none; border-color: rgba(255,255,255,0.5); }
-`;
-
-const Content = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 3rem 2rem;
-`;
-
-const TabRow = styled.div`
+const Tabs = styled.div`
   display: flex;
   gap: 0;
-  margin-bottom: 2rem;
+  margin: 2.75rem 0 1.5rem;
   border-bottom: 1px solid ${props => props.theme.colors.border};
 `;
 
 const Tab = styled.button`
-  padding: 0.75rem 1.5rem;
+  padding: 0.85rem 1.6rem;
   background: none;
   border: none;
-  border-bottom: 2px solid ${props => props.$active ? props.theme.colors.primary : 'transparent'};
-  color: ${props => props.$active ? props.theme.colors.text : props.theme.colors.textMuted};
-  font-size: ${props => props.theme.fontSizes.sm};
-  font-weight: ${props => props.$active ? 600 : 400};
-  cursor: pointer;
-  transition: all 0.3s ease;
+  border-bottom: 2px solid ${props => props.$active ? props.theme.colors.identity : 'transparent'};
+  color: ${props => props.$active ? props.theme.colors.identity : props.theme.colors.textLight};
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 11px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all ${props => props.theme.transitions.fast};
 
-  &:hover { color: ${props => props.theme.colors.text}; }
+  &:hover { color: ${props => props.theme.colors.identity}; }
 `;
 
 const Toolbar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
+  margin-bottom: 1.75rem;
 `;
 
 const FilterRow = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
 `;
 
 const FilterBtn = styled.button`
-  padding: 0.45rem 1rem;
-  background: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
+  padding: 0.5rem 1.1rem;
+  background: ${props => props.$active ? props.theme.colors.identity : 'transparent'};
   color: ${props => props.$active ? props.theme.colors.white : props.theme.colors.textLight};
-  border: 1px solid ${props => props.$active ? props.theme.colors.primary : props.theme.colors.border};
-  font-size: ${props => props.theme.fontSizes.sm};
-  font-weight: 500;
+  border: 1px solid ${props => props.$active ? props.theme.colors.identity : props.theme.colors.border};
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all ${props => props.theme.transitions.fast};
 
-  &:hover { border-color: ${props => props.theme.colors.primary}; }
+  &:hover { border-color: ${props => props.theme.colors.identity}; color: ${props => props.$active ? props.theme.colors.white : props.theme.colors.identity}; }
 `;
 
 const SortSelect = styled.select`
-  padding: 0.45rem 1rem;
+  padding: 0.55rem 1rem;
   border: 1px solid ${props => props.theme.colors.border};
-  background: ${props => props.theme.colors.white};
+  background: ${props => props.theme.colors.cream};
   color: ${props => props.theme.colors.text};
-  font-size: ${props => props.theme.fontSizes.sm};
-  font-family: ${props => props.theme.fonts.sans};
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
+
+  &:focus { outline: none; border-color: ${props => props.theme.colors.identity}; }
 `;
 
-const ResultsCount = styled.p`
-  font-size: ${props => props.theme.fontSizes.sm};
-  color: ${props => props.theme.colors.textMuted};
-  margin-bottom: 1.5rem;
+const Count = styled.p`
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: ${props => props.theme.colors.textLight};
+  margin: 0 0 1.75rem;
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
 
+  @media (max-width: ${props => props.theme.breakpoints.desktop}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     grid-template-columns: 1fr;
   }
@@ -130,117 +117,123 @@ const Grid = styled.div`
 const Card = styled(Link)`
   display: block;
   background: ${props => props.theme.colors.white};
+  border: 1px solid ${props => props.theme.colors.borderLight};
   overflow: hidden;
-  transition: all 0.4s ease;
+  transition: all ${props => props.theme.transitions.normal} ${props => props.theme.transitions.cubic};
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
     box-shadow: ${props => props.theme.shadows.lg};
-    img { transform: scale(1.05); }
+    img { transform: scale(1.07); }
   }
 `;
 
 const CardImg = styled.div`
   position: relative;
-  height: 200px;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s ease;
+    transition: transform 0.8s ${props => props.theme.transitions.cubic};
   }
 
-  .type-badge {
+  .badge {
     position: absolute;
     top: 1rem;
     left: 1rem;
-    background: rgba(31,58,50,0.9);
-    color: white;
-    padding: 0.3rem 0.75rem;
-    font-size: 11px;
+    background: rgba(41, 39, 34, 0.88);
+    color: ${props => props.theme.colors.white};
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 500;
+    padding: 0.4rem 0.85rem;
   }
 
-  .rating-badge {
+  .rating {
     position: absolute;
     bottom: 1rem;
-    right: 1rem;
-    background: white;
-    padding: 0.25rem 0.6rem;
-    font-size: 13px;
-    font-weight: 600;
+    left: 1rem;
+    background: ${props => props.theme.colors.white};
+    color: ${props => props.theme.colors.text};
+    font-size: 12px;
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    box-shadow: ${props => props.theme.shadows.sm};
   }
 
   .heart {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    width: 36px;
-    height: 36px;
-    background: rgba(255,255,255,0.9);
+    width: 38px;
+    height: 38px;
+    background: ${props => props.theme.colors.white};
     border-radius: 50%;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 1.05rem;
+    color: ${props => props.$saved ? props.theme.colors.identity : props.theme.colors.textLight};
     cursor: pointer;
-    transition: all 0.3s ease;
     z-index: 2;
-    border: none;
-    &:hover { transform: scale(1.1); }
+    transition: all ${props => props.theme.transitions.fast};
+    &:hover { transform: scale(1.12); }
   }
 `;
 
 const CardBody = styled.div`
-  padding: 1.25rem;
+  padding: 1.5rem 1.75rem 1.9rem;
 `;
 
 const CardName = styled.h3`
-  font-family: ${props => props.theme.fonts.serif};
-  font-size: ${props => props.theme.fontSizes.xl};
-  font-weight: 500;
+  font-size: 1.45rem;
   margin-bottom: 0.35rem;
-  color: ${props => props.theme.colors.text};
 `;
 
-const CardLoc = styled.p`
-  font-size: ${props => props.theme.fontSizes.sm};
-  color: ${props => props.theme.colors.textMuted};
-  margin-bottom: 0.75rem;
+const CardSub = styled.p`
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${props => props.theme.colors.accentDeep};
+  margin-bottom: 0.9rem;
 `;
 
 const CardPrice = styled.div`
   display: flex;
   align-items: baseline;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  border-top: 1px solid ${props => props.theme.colors.borderLight};
+  padding-top: 1rem;
 
   strong {
-    font-size: ${props => props.theme.fontSizes.xl};
-    font-weight: 600;
-    color: ${props => props.theme.colors.text};
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 1rem;
+    font-weight: 400;
+    color: ${props => props.theme.colors.identity};
   }
 
   span {
-    font-size: ${props => props.theme.fontSizes.sm};
-    color: ${props => props.theme.colors.textMuted};
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: ${props => props.theme.colors.textLight};
   }
 `;
 
-const EmptyState = styled.div`
+const Empty = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  color: ${props => props.theme.colors.textMuted};
+  border: 1px dashed ${props => props.theme.colors.border};
 
-  h3 {
-    font-family: ${props => props.theme.fonts.serif};
-    font-size: ${props => props.theme.fontSizes.xxl};
-    color: ${props => props.theme.colors.textLight};
-    margin-bottom: 0.5rem;
-  }
+  h3 { font-size: 1.8rem; margin-bottom: 0.4rem; }
+  p { color: ${props => props.theme.colors.textLight}; }
 `;
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -261,7 +254,6 @@ function buildItems() {
     sortPrice: a.priceFrom,
     sortRating: a.rating,
     sortReviews: a.reviewCount,
-    _raw: a,
   }));
   const exps = experiences.map(e => ({
     _type: 'experience',
@@ -277,7 +269,6 @@ function buildItems() {
     sortPrice: e.priceFrom,
     sortRating: e.rating,
     sortReviews: e.reviewCount,
-    _raw: e,
   }));
   const rest = restaurants.map(r => ({
     _type: 'dining',
@@ -293,7 +284,6 @@ function buildItems() {
     sortPrice: r.pricePerPerson,
     sortRating: r.rating,
     sortReviews: r.reviewCount,
-    _raw: r,
   }));
   return [...stays, ...exps, ...rest];
 }
@@ -306,8 +296,7 @@ const TABS = [
 ];
 
 const TRIP_FILTERS = ['All', 'Family Friendly', 'Adventure', 'Luxury', 'Budget', 'Romantic', 'Business Travel'];
-
-const STAY_FILTERS = ['All', 'Heritage Hotel', 'Safari Lodge', 'Boutique Hotel', 'Resort', 'Guest Lodge', 'Hotel'];
+const STAY_FILTERS = ['All', ...new Set(accommodations.map(a => a.category))];
 const EXP_FILTERS = ['All', ...new Set(experiences.map(e => e.type))];
 
 export default function DiscoverPage({ isInCollection, toggleCollection }) {
@@ -333,8 +322,7 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
     }
 
     if (subFilter !== 'All') {
-      if (tab === 'stay') results = results.filter(i => i.badge === subFilter);
-      else if (tab === 'experience') results = results.filter(i => i.badge === subFilter);
+      if (tab === 'stay' || tab === 'experience') results = results.filter(i => i.badge === subFilter);
       else if (tab === 'all') {
         switch (subFilter) {
           case 'Luxury': results = results.filter(i => i.sortPrice > 300); break;
@@ -374,28 +362,30 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
   };
 
   return (
-    <PageWrapper>
-      <HeroSection>
-        <HeroTitle>Discover Victoria Falls</HeroTitle>
-        <HeroSub>Attractions, restaurants, hotels, activities, and events — all in one place</HeroSub>
-        <SearchContainer>
-          <SearchInput
+    <>
+      <PageHero
+        eyebrow="Module 08 — The Discovery Layer"
+        title={<>Search the <em>whole system.</em></>}
+        subtitle="One search across every stay, experience, and table in Victoria Falls."
+        image={accommodations[0].images[0]}
+      >
+        <SearchBar>
+          <input
             placeholder="Search stays, experiences, restaurants..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             aria-label="Search stays, experiences, and restaurants"
           />
-        </SearchContainer>
-      </HeroSection>
-
-      <Content>
-        <TabRow>
+        </SearchBar>
+      </PageHero>
+      <Container>
+        <Tabs>
           {TABS.map(t => (
             <Tab key={t.key} $active={tab === t.key} onClick={() => { setTab(t.key); setSubFilter('All'); }}>
               {t.label}
             </Tab>
           ))}
-        </TabRow>
+        </Tabs>
 
         <Toolbar>
           <FilterRow>
@@ -412,30 +402,30 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
           </SortSelect>
         </Toolbar>
 
-        <ResultsCount>{filtered.length} {filtered.length === 1 ? 'result' : 'results'} found</ResultsCount>
+        <Count>{filtered.length} {filtered.length === 1 ? 'result' : 'results'} found</Count>
 
         {filtered.length === 0 ? (
-          <EmptyState>
+          <Empty>
             <h3>No results found</h3>
             <p>Try adjusting your search or filters</p>
-          </EmptyState>
+          </Empty>
         ) : (
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <Grid>
               {filtered.map(item => (
                 <motion.div key={`${item._type}-${item.id}`} variants={fadeUp}>
                   <Card to={item.slug}>
-                    <CardImg>
+                    <CardImg $saved={isInCollection(item.id)}>
                       <img src={item.image} alt={item.name} loading="lazy" />
-                      <span className="type-badge">{item.badge}</span>
-                      <span className="rating-badge">★ {item.rating}</span>
+                      <span className="badge">{item.badge}</span>
+                      <span className="rating">★ {item.rating}</span>
                       <button className="heart" onClick={e => handleHeart(e, item)} aria-label={isInCollection(item.id) ? 'Remove from collection' : 'Save to collection'}>
                         {isInCollection(item.id) ? '♥' : '♡'}
                       </button>
                     </CardImg>
                     <CardBody>
                       <CardName>{item.name}</CardName>
-                      <CardLoc>{item.subtitle}</CardLoc>
+                      <CardSub>{item.subtitle}</CardSub>
                       <CardPrice>
                         <strong>{item.price}</strong>
                         <span>{item.priceUnit}</span>
@@ -447,7 +437,7 @@ export default function DiscoverPage({ isInCollection, toggleCollection }) {
             </Grid>
           </motion.div>
         )}
-      </Content>
-    </PageWrapper>
+      </Container>
+    </>
   );
 }

@@ -1,519 +1,1213 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import styled, { css } from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import Icon from '../components/Icon';
-import { signatureJourneys } from '../data/data';
+import { Container, Section, SectionHeading, Eyebrow, Btn } from '../components/ui';
+import { accommodations, experiences, restaurants, events, transportServices, guides } from '../data/data';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
-};
-const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
+const HERO_IMG = 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=2000&q=85';
 
-/* ─── SHARED ─── */
-const Section = styled.section` padding:${p=>p.theme.spacing.section} 2rem; max-width:1400px; margin:0 auto; `;
-const FullBleed = styled.section` padding:${p=>p.theme.spacing.section} 0; overflow:hidden; `;
-const SectionHeader = styled.div` text-align:center; margin-bottom:4rem; `;
-const SectionLabel = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; display:block; margin-bottom:1rem; `;
-const SectionTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4vw,3.25rem); font-weight:300; color:${p=>p.theme.colors.text}; margin-bottom:1.25rem; letter-spacing:-0.01em; `;
-const SectionDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:${p=>p.theme.colors.textLight}; max-width:520px; margin:0 auto; line-height:1.8; `;
-const Divider = styled.div` width:60px; height:1px; background:${p=>p.theme.colors.champagne}; margin:0 auto 2rem; `;
-
-/* ─── HERO ─── */
 const Hero = styled.section`
-  height: 100vh; min-height: 750px; display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-  background: ${p => p.theme.colors.primaryDark};
+  position: relative;
+  height: 100vh;
+  min-height: 720px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: ${props => props.theme.colors.backgroundDark};
+`;
+
+const HeroBg = styled.div`
+  position: absolute;
+  inset: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.72;
+    animation: heroZoom 20s ${props => props.theme.transitions.cubic} forwards;
+  }
+
   &::after {
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(135deg, rgba(21,42,36,0.7) 0%, rgba(31,58,50,0.45) 40%, rgba(21,42,36,0.65) 100%);
-    z-index:1;
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(41,39,34,0.94) 0%,
+      rgba(41,39,34,0.5) 45%,
+      rgba(41,39,34,0.18) 100%
+    );
+  }
+
+  @keyframes heroZoom {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
   }
 `;
-const HeroContent = styled.div` text-align:center; position:relative; z-index:2; padding:0 2rem; max-width:880px; `;
-const VideoManager = styled.div` position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; `;
-const HeroVideo = styled.video` width:100%; height:100%; object-fit:cover; display:block; `;
-const HeroLabel = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.5rem; `;
-const HeroTitle = styled(motion.h1)` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2.8rem,6.5vw,5rem); font-weight:300; color:${p=>p.theme.colors.white}; line-height:1.1; margin-bottom:1.75rem; letter-spacing:-0.01em; `;
-const HeroSub = styled(motion.p)` font-size:${p=>p.theme.fontSizes.lg}; color:rgba(255,255,255,0.6); max-width:600px; margin:0 auto 3.5rem; line-height:1.8; font-weight:300; `;
-const HeroCTAs = styled(motion.div)` display:flex; gap:1.25rem; justify-content:center; flex-wrap:wrap; `;
-const BtnPrimary = styled(Link)` padding:1rem 3rem; background:${p=>p.theme.colors.champagne}; color:${p=>p.theme.colors.primaryDark}; font-size:${p=>p.theme.fontSizes.sm}; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); &:hover{ background:${p=>p.theme.colors.white}; transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.15); } `;
-const BtnOutline = styled(Link)` padding:1rem 3rem; background:transparent; color:${p=>p.theme.colors.white}; border:1px solid rgba(255,255,255,0.3); font-size:${p=>p.theme.fontSizes.sm}; font-weight:500; text-transform:uppercase; letter-spacing:0.12em; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); &:hover{ background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.5); transform:translateY(-2px); } `;
-const HeroScroll = styled(motion.div)` position:absolute; bottom:3rem; left:50%; transform:translateX(-50%); z-index:3; color:rgba(255,255,255,0.4); font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.2em; display:flex; flex-direction:column; align-items:center; gap:0.75rem; `;
-const ScrollLine = styled.div` width:1px; height:40px; background:linear-gradient(transparent, rgba(255,255,255,0.4)); `;
 
-/* ─── WHY VICTORIA FALLS ─── */
-const WhySection = styled.section` padding:6rem 0 0; `;
-const WhyGrid = styled.div` display:grid; grid-template-columns:1fr 1fr; min-height:400px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
-const WhyImage = styled.div` position:relative; overflow:hidden; img{ width:100%; height:100%; object-fit:cover; display:block; min-height:400px; @media(max-width:${p=>p.theme.breakpoints.tablet}){ min-height:280px; } } `;
-const WhyContent = styled.div` display:flex; flex-direction:column; justify-content:center; padding:3rem 3.5rem; background:${p=>p.theme.colors.cream}; @media(max-width:${p=>p.theme.breakpoints.tablet}){ padding:2.5rem 2rem; } `;
-const WhyLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.3em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.cocoa}; } `;
-const WhyTitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:${p=>p.theme.colors.text}; line-height:1.15; margin-bottom:1.5rem; `;
-const WhyDesc = styled.p` font-size:${p=>p.theme.fontSizes.md}; color:${p=>p.theme.colors.textLight}; line-height:1.9; margin-bottom:2.5rem; max-width:480px; `;
-const WhyList = styled.div` display:flex; flex-direction:column; gap:1.25rem; `;
-const WhyItem = styled(motion.div)` display:flex; gap:1.25rem; align-items:flex-start; `;
-const WhyItemIcon = styled.div` flex-shrink:0; width:44px; height:44px; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.3s; ${WhyItem}:hover &{ background:${p=>p.theme.colors.cocoa}; } `;
-const WhyItemTitle = styled.h4` font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.lg}; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.15rem; `;
-const WhyItemText = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; line-height:1.6; `;
+const HeroInner = styled.div`
+  position: relative;
+  z-index: 2;
+  max-width: ${props => props.theme.maxWidth};
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 ${props => props.theme.spacing.gutter} 0;
+  color: ${props => props.theme.colors.white};
+`;
 
-/* ─── HANDPICKED STAYS ─── */
-const StaysScroll = styled.div` display:flex; gap:2rem; padding:0 2rem; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; &::-webkit-scrollbar{display:none;} `;
-const StayCard = styled(Link)` flex:0 0 380px; scroll-snap-align:start; background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; overflow:hidden; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); display:block; text-decoration:none; color:inherit; &:hover{ box-shadow:${p=>p.theme.shadows.lg}; transform:translateY(-4px); border-color:transparent; .stayimg img{transform:scale(1.05);} } `;
-const StayImg = styled.div` height:260px; overflow:hidden; position:relative; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); } `;
-const StayBadge = styled.div` position:absolute; top:1rem; left:1rem; padding:0.35rem 0.75rem; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); color:white; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:500; `;
-const StayBody = styled.div` padding:1.75rem; `;
-const StayCategory = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; `;
-const StayName = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:1.35rem; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.75rem; line-height:1.3; `;
-const StayMeta = styled.div` display:flex; align-items:center; gap:1rem; margin-bottom:1rem; font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; `;
-const StayRating = styled.span` color:${p=>p.theme.colors.gold}; font-weight:600; `;
-const StayPriceRow = styled.div` display:flex; justify-content:space-between; align-items:center; padding-top:1rem; border-top:1px solid ${p=>p.theme.colors.borderLight}; `;
-const StayPrice = styled.div` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; span{ font-size:${p=>p.theme.fontSizes.xl}; font-weight:600; color:${p=>p.theme.colors.text}; } `;
-const StayCTA = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.1em; font-weight:600; color:${p=>p.theme.colors.primary}; transition:color 0.3s; ${StayCard}:hover &{ color:${p=>p.theme.colors.cocoa}; } `;
+const HeroSystem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
 
-/* ─── BANNER ─── */
-const BannerSection = styled.section` position:relative; height:75vh; min-height:550px; overflow:hidden; background:${p=>p.theme.colors.primaryDark}; `;
-const BannerSlide = styled.div` position:absolute; inset:0; opacity:${p=>p.$active?1:0}; transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1); pointer-events:${p=>p.$active?'auto':'none'}; `;
-const BannerImg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; transition:transform 8s linear; ${p=>p.$active && css`img{ transform:scale(1.08); }`} } `;
-const BannerOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(135deg, rgba(21,42,36,0.82) 0%, rgba(31,58,50,0.55) 50%, rgba(21,42,36,0.75) 100%); `;
-const BannerContent = styled.div` position:relative; z-index:2; height:100%; display:flex; flex-direction:column; justify-content:center; padding:0 8%; max-width:1400px; margin:0 auto; `;
-const BannerTag = styled(motion.div)` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.champagne}; font-weight:500; margin-bottom:1.25rem; display:flex; align-items:center; gap:1rem; &::before{ content:''; width:40px; height:1px; background:${p=>p.theme.colors.champagne}; } `;
-const BannerTitle = styled(motion.h2)` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,4.5vw,3.75rem); font-weight:300; color:${p=>p.theme.colors.white}; line-height:1.15; margin-bottom:1.25rem; max-width:600px; `;
-const BannerDesc = styled(motion.p)` font-size:${p=>p.theme.fontSizes.md}; color:rgba(255,255,255,0.7); max-width:480px; line-height:1.8; margin-bottom:2.5rem; `;
-const BannerCTA = styled(motion(Link))` display:inline-flex; align-items:center; gap:0.75rem; padding:1rem 2.5rem; background:transparent; border:1px solid rgba(255,255,255,0.3); color:${p=>p.theme.colors.white}; font-size:${p=>p.theme.fontSizes.sm}; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.4s; width:fit-content; text-decoration:none; &:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.5); } `;
-const BannerControls = styled.div` position:absolute; bottom:3rem; left:50%; transform:translateX(-50%); z-index:5; display:flex; align-items:center; gap:1.5rem; `;
-const BannerDot = styled.button` width:${p=>p.$active?'32px':'8px'}; height:8px; border-radius:4px; background:${p=>p.$active?p.theme.colors.champagne:'rgba(255,255,255,0.3)'}; border:none; cursor:pointer; transition:all 0.4s; padding:0; &:hover{ background:rgba(255,255,255,0.6); } `;
-const BannerCounter = styled.div` position:absolute; top:3rem; right:4rem; z-index:5; font-family:${p=>p.theme.fonts.serif}; font-size:${p=>p.theme.fontSizes.xl}; color:rgba(255,255,255,0.5); font-weight:300; `;
-const BannerArrow = styled.button` position:absolute; top:50%; ${p=>p.$left?'left:2rem;':'right:2rem;'} transform:translateY(-50%); z-index:5; width:48px; height:48px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.2); backdrop-filter:blur(4px); color:white; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.3s; opacity:0; ${BannerSection}:hover &{ opacity:1; } &:hover{ background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.4); } `;
-const PlatformIconStrip = styled.div` position:absolute; bottom:6rem; left:0; right:0; z-index:5; display:flex; justify-content:center; gap:2.5rem; opacity:0.4; transition:opacity 0.3s; ${BannerSection}:hover &{ opacity:0.7; } `;
-const PlatformIconItem = styled(Link)` display:flex; flex-direction:column; align-items:center; gap:0.5rem; color:rgba(255,255,255,0.8); text-decoration:none; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.3s; &:hover{ color:${p=>p.theme.colors.champagne}; } ${p=>p.$active && css` color:${p=>p.theme.colors.champagne}; `} `;
+  .sys-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: ${props => props.theme.colors.accent};
+    animation: pulse 2s ease infinite;
+  }
+`;
 
-/* ─── JOURNEYS ─── */
-const JourneyScroll = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; padding:0 2rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
-const JourneyCard = styled(Link)` position:relative; height:480px; overflow:hidden; display:block; border-radius:2px; text-decoration:none; &:hover .jimg img{transform:scale(1.06);} &:hover .joverlay{opacity:1;}`;
-const JImg = styled.div` position:absolute; inset:0; background:${p=>p.theme.colors.primary}; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.7s cubic-bezier(0.22,1,0.36,1); } `;
-const JOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(transparent 35%, rgba(21,42,36,0.93)); display:flex; flex-direction:column; justify-content:flex-end; padding:2.5rem; transition:opacity 0.3s; `;
-const JTag = styled.span` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.25em; color:${p=>p.theme.colors.champagne}; margin-bottom:0.5rem; font-weight:500; `;
-const JName = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:1.65rem; color:${p=>p.theme.colors.white}; font-weight:400; margin-bottom:0.75rem; line-height:1.25; `;
-const JMeta = styled.div` display:flex; align-items:center; gap:1rem; font-size:${p=>p.theme.fontSizes.sm}; color:rgba(255,255,255,0.6); `;
-const JPrice = styled.span` color:${p=>p.theme.colors.champagne}; font-weight:600; `;
+const HeroSysText = styled.div`
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: ${props => props.theme.colors.accent};
+`;
 
-/* ─── INTERACTIVE MAP ─── */
-const MapSection = styled.section` background:${p=>p.theme.colors.cream}; padding:${p=>p.theme.spacing.section} 0; `;
-const MapInner = styled.div` max-width:1400px; margin:0 auto; padding:0 2rem; `;
-const MapLayout = styled.div` display:grid; grid-template-columns:1.3fr 1fr; gap:3rem; align-items:start; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:1fr; } `;
-const MapCanvas = styled.div` position:relative; background:${p=>p.theme.colors.primary}; border-radius:4px; overflow:hidden; aspect-ratio:4/3; `;
-const MapSvg = styled.div` position:absolute; inset:0; display:flex; align-items:center; justify-content:center; `;
-const MapPin = styled.button` position:absolute; width:${p=>p.$active?'18px':'14px'}; height:${p=>p.$active?'18px':'14px'}; border-radius:50%; background:${p=>p.$active?p.theme.colors.champagne:p.theme.colors.white}; border:2px solid ${p=>p.theme.colors.primary}; cursor:pointer; transition:all 0.3s; z-index:${p=>p.$active?3:2}; transform:translate(-50%,-50%); ${p=>p.$active && css` box-shadow:0 0 0 6px rgba(216,195,165,0.3); `} &:hover{ transform:translate(-50%,-50%) scale(1.2); } `;
-const MapPinLabel = styled.div` position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); white-space:nowrap; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:${p=>p.theme.colors.white}; background:${p=>p.theme.colors.primary}; padding:0.25rem 0.6rem; opacity:${p=>p.$active?1:0}; transition:opacity 0.3s; pointer-events:none; `;
-const MapInfo = styled.div` background:${p=>p.theme.colors.white}; border:1px solid ${p=>p.theme.colors.borderLight}; padding:2rem; `;
-const MapInfoCategory = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; `;
-const MapInfoName = styled.h3` font-family:${p=>p.theme.fonts.serif}; font-size:1.5rem; font-weight:500; color:${p=>p.theme.colors.text}; margin-bottom:0.5rem; `;
-const MapInfoRating = styled.div` color:${p=>p.theme.colors.gold}; font-size:${p=>p.theme.fontSizes.sm}; margin-bottom:0.75rem; `;
-const MapInfoDesc = styled.p` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.7; margin-bottom:1.25rem; `;
-const MapInfoPrice = styled.div` font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textMuted}; margin-bottom:1.25rem; span{ font-size:${p=>p.theme.fontSizes.xl}; font-weight:600; color:${p=>p.theme.colors.text}; } `;
-const MapInfoBtn = styled(Link)` display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.5rem; background:${p=>p.theme.colors.primary}; color:${p=>p.theme.colors.white}; font-size:${p=>p.theme.fontSizes.sm}; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; transition:all 0.3s; &:hover{ background:${p=>p.theme.colors.primaryDark}; } `;
-const MapPinsList = styled.div` display:flex; flex-direction:column; gap:0.5rem; margin-top:1.5rem; `;
-const MapPinBtn = styled.button` display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; background:${p=>p.$active?p.theme.colors.primary:'transparent'}; color:${p=>p.$active?p.theme.colors.white:p.theme.colors.text}; border:1px solid ${p=>p.$active?p.theme.colors.primary:p.theme.colors.borderLight}; text-align:left; cursor:pointer; transition:all 0.3s; font-size:${p=>p.theme.fontSizes.sm}; font-family:${p=>p.theme.fonts.sans}; &:hover{ border-color:${p=>p.theme.colors.primary}; } `;
-const PinDot = styled.span` width:8px; height:8px; border-radius:50%; flex-shrink:0; background:${p=>p.$active?p.theme.colors.champagne:p.theme.colors.primary}; `;
+const HeroTitle = styled.h1`
+  color: ${props => props.theme.colors.white};
+  font-size: clamp(2.9rem, 7vw, 5.75rem);
+  font-weight: 300;
+  line-height: 1.02;
+  margin-bottom: 1.5rem;
+  max-width: 950px;
 
-/* ─── GUIDES ─── */
-const GuidesGrid = styled.div` display:grid; grid-template-columns:repeat(4,1fr); gap:1.75rem; @media(max-width:${p=>p.theme.breakpoints.tablet}){ grid-template-columns:repeat(2,1fr); } @media(max-width:${p=>p.theme.breakpoints.mobile}){ grid-template-columns:1fr; } `;
-const GuideCard = styled(Link)` display:block; background:${p=>p.theme.colors.white}; overflow:hidden; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); text-decoration:none; color:inherit; &:hover{ box-shadow:${p=>p.theme.shadows.md}; .gimg img{transform:scale(1.04);} } `;
-const GCardImg = styled.div` height:220px; overflow:hidden; background:${p=>p.theme.colors.backgroundAlt}; img{ width:100%; height:100%; object-fit:cover; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); } `;
-const GCardBody = styled.div` padding:1.5rem; .cat{ font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.15em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:0.5rem; } h3{ font-family:${p=>p.theme.fonts.serif}; font-size:1.15rem; font-weight:500; margin-bottom:0.5rem; line-height:1.3; color:${p=>p.theme.colors.text}; } p{ font-size:${p=>p.theme.fontSizes.sm}; color:${p=>p.theme.colors.textLight}; line-height:1.7; } `;
+  em {
+    font-style: italic;
+    color: ${props => props.theme.colors.accent};
+  }
+`;
 
-/* ─── TRUSTED BY ─── */
-const PartnersSection = styled.section` padding:5rem 2rem; max-width:1400px; margin:0 auto; text-align:center; `;
-const PartnersLabel = styled.div` font-size:${p=>p.theme.fontSizes.xs}; text-transform:uppercase; letter-spacing:0.35em; color:${p=>p.theme.colors.cocoa}; font-weight:500; margin-bottom:3rem; `;
-const PartnersGrid = styled.div` display:flex; align-items:center; justify-content:center; gap:4rem; flex-wrap:wrap; opacity:0.5; transition:opacity 0.3s; &:hover{ opacity:0.7; } @media(max-width:${p=>p.theme.breakpoints.tablet}){ gap:2.5rem; } `;
-const PartnerLogo = styled.div` display:flex; align-items:center; justify-content:center; gap:0.75rem; font-family:${p=>p.theme.fonts.serif}; font-size:1.1rem; font-weight:500; color:${p=>p.theme.colors.text}; letter-spacing:0.02em; white-space:nowrap; svg{ flex-shrink:0; } `;
+const HeroSub = styled.p`
+  color: rgba(250, 248, 243, 0.82);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  max-width: 620px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+`;
 
-/* ─── FINAL CTA ─── */
-const FinalCTA = styled.section` position:relative; height:60vh; min-height:450px; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; `;
-const FinalCTABg = styled.div` position:absolute; inset:0; img{ width:100%; height:100%; object-fit:cover; } `;
-const FinalCTAOverlay = styled.div` position:absolute; inset:0; background:linear-gradient(135deg, rgba(21,42,36,0.85), rgba(31,58,50,0.7)); `;
-const FinalCTAContent = styled.div` position:relative; z-index:2; padding:2rem; `;
-const FinalCTATitle = styled.h2` font-family:${p=>p.theme.fonts.serif}; font-size:clamp(2rem,5vw,3.5rem); font-weight:300; color:${p=>p.theme.colors.white}; margin-bottom:2.5rem; line-height:1.2; `;
-const FinalCTAButtons = styled.div` display:flex; gap:1.25rem; justify-content:center; flex-wrap:wrap; `;
+const CommandBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(250, 248, 243, 0.08);
+  border: 1px solid rgba(203, 184, 157, 0.4);
+  backdrop-filter: blur(12px);
+  padding: 0.35rem 0.35rem 0.35rem 1.5rem;
+  max-width: 780px;
+  transition: border-color ${props => props.theme.transitions.fast};
 
-/* ─── DATA ─── */
-const WHY_FEATURES = [
-  { icon: 'compass', title: 'UNESCO World Heritage Site', text: 'One of the Seven Natural Wonders of the World.' },
-  { icon: 'sun', title: 'Wildlife Corridors', text: 'Connecting Zambezi National Park and beyond.' },
-  { icon: 'mountain', title: 'Adventure Capital', text: 'Bungee, rafting, helicopter flights, and more.' },
-  { icon: 'pool', title: 'Luxury Meets Wilderness', text: 'World-class lodges in pristine settings.' },
+  &:hover, &:focus-within {
+    border-color: ${props => props.theme.colors.accent};
+  }
+
+  svg {
+    color: ${props => props.theme.colors.accent};
+    flex-shrink: 0;
+  }
+
+  .cmd-text {
+    font-family: ${props => props.theme.fonts.serif};
+    font-size: 1.05rem;
+    font-style: italic;
+    color: rgba(250, 248, 243, 0.55);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    .cmd-text { font-size: 0.9rem; }
+  }
+`;
+
+const CommandBtn = styled(Link)`
+  background: ${props => props.theme.colors.accent};
+  color: ${props => props.theme.colors.text};
+  padding: 0.95rem 1.9rem;
+  font-family: ${props => props.theme.fonts.mono};
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all ${props => props.theme.transitions.normal};
+
+  &:hover {
+    background: ${props => props.theme.colors.white};
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 0.85rem 1.2rem;
+    font-size: 10px;
+  }
+`;
+
+const QuickChips = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+
+  a {
+    font-size: 12px;
+    color: rgba(250, 248, 243, 0.55);
+    border: 1px solid rgba(250, 248, 243, 0.2);
+    padding: 0.4rem 1rem;
+    font-family: ${props => props.theme.fonts.mono};
+    letter-spacing: 0.08em;
+    transition: all ${props => props.theme.transitions.fast};
+
+    &:hover {
+      color: ${props => props.theme.colors.white};
+      border-color: ${props => props.theme.colors.accent};
+    }
+  }
+`;
+
+const HeroStats = styled.div`
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(203, 184, 157, 0.25);
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  background: rgba(41, 39, 34, 0.25);
+  backdrop-filter: blur(10px);
+`;
+
+const HeroStatsInner = styled.div`
+  max-width: ${props => props.theme.maxWidth};
+  margin: 0 auto;
+  padding: 1.4rem ${props => props.theme.spacing.gutter};
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+`;
+
+const HStat = styled.div`
+  .v {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    color: ${props => props.theme.colors.white};
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: ${props => props.theme.colors.identityLight};
+      animation: pulse 2.4s ease infinite;
+    }
+  }
+
+  .l {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(250, 248, 243, 0.45);
+  }
+`;
+
+const SystemSection = styled(Section)`
+  background: ${props => props.theme.colors.background};
+`;
+
+const PillarGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: ${props => props.theme.colors.border};
+  border: 1px solid ${props => props.theme.colors.border};
+
+  @media (max-width: ${props => props.theme.breakpoints.desktop}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const Pillar = styled(Link)`
+  background: ${props => props.theme.colors.cream};
+  padding: 2.75rem 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all ${props => props.theme.transitions.normal} ${props => props.theme.transitions.cubic};
+  display: block;
+
+  .num {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: ${props => props.theme.colors.accentDeep};
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  h3 {
+    font-size: 1.7rem;
+    margin-bottom: 0.6rem;
+    transition: color ${props => props.theme.transitions.fast};
+  }
+
+  p {
+    font-size: ${props => props.theme.fontSizes.sm};
+    line-height: 1.65;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: ${props => props.theme.colors.identity};
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform ${props => props.theme.transitions.normal} ${props => props.theme.transitions.cubic};
+  }
+
+  &:hover {
+    background: ${props => props.theme.colors.white};
+    transform: translateY(-3px);
+    box-shadow: ${props => props.theme.shadows.lg};
+
+    h3 { color: ${props => props.theme.colors.identity}; }
+    &::after { transform: scaleX(1); }
+  }
+`;
+
+const FeaturedRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const StayCard = styled(Link)`
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: ${props => props.theme.colors.backgroundDark};
+  aspect-ratio: 3 / 4;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s ${props => props.theme.transitions.cubic};
+    opacity: 0.92;
+  }
+
+  .shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(41,39,34,0.88) 0%, rgba(41,39,34,0.1) 55%, rgba(41,39,34,0.15) 100%);
+  }
+
+  .content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 2rem;
+    color: ${props => props.theme.colors.white};
+
+    .tag {
+      font-family: ${props => props.theme.fonts.mono};
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: ${props => props.theme.colors.accent};
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    h3 {
+      color: ${props => props.theme.colors.white};
+      font-size: 1.75rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .meta {
+      font-family: ${props => props.theme.fonts.mono};
+      font-size: 11px;
+      color: rgba(250,248,243,0.7);
+      display: flex;
+      justify-content: space-between;
+      letter-spacing: 0.06em;
+    }
+  }
+
+  &:hover {
+    img { transform: scale(1.07); }
+    .content h3 { color: ${props => props.theme.colors.accent}; }
+  }
+`;
+
+const Split = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const SplitMedia = styled.div`
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    min-height: 460px;
+    object-fit: cover;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1.25rem -1.25rem -1.25rem 1.25rem;
+    border: 1px solid ${props => props.theme.colors.accent};
+    opacity: 0.5;
+    pointer-events: none;
+  }
+`;
+
+const ExpList = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ExpItem = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
+  transition: padding-left ${props => props.theme.transitions.normal} ${props => props.theme.transitions.cubic};
+
+  .idx {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 11px;
+    color: ${props => props.theme.colors.accentDeep};
+    letter-spacing: 0.15em;
+    flex-shrink: 0;
+    width: 3rem;
+  }
+
+  .body {
+    flex: 1;
+
+    h4 {
+      font-size: 1.35rem;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: ${props => props.theme.fontSizes.sm};
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+
+      span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-family: ${props => props.theme.fonts.mono};
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: ${props => props.theme.colors.textLight};
+      }
+    }
+  }
+
+  .price {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 0.9rem;
+    color: ${props => props.theme.colors.identity};
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    padding-left: 1rem;
+    border-bottom-color: ${props => props.theme.colors.accent};
+
+    h4 { color: ${props => props.theme.colors.identity}; }
+  }
+
+  &:last-child { border-bottom: none; }
+`;
+
+const DarkSection = styled(Section)`
+  background: ${props => props.theme.colors.backgroundDark};
+  color: ${props => props.theme.colors.white};
+`;
+
+const EventTicker = styled.div`
+  overflow: hidden;
+  background: ${props => props.theme.colors.identity};
+  padding: 1rem 0;
+  position: relative;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    z-index: 2;
+  }
+
+  &::before { left: 0; background: linear-gradient(90deg, ${props => props.theme.colors.identity}, transparent); }
+  &::after { right: 0; background: linear-gradient(-90deg, ${props => props.theme.colors.identity}, transparent); }
+`;
+
+const TickerTrack = styled.div`
+  display: flex;
+  gap: 4rem;
+  width: max-content;
+  animation: ticker 45s linear infinite;
+
+  &:hover { animation-play-state: paused; }
+`;
+
+const TickerItem = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: ${props => props.theme.colors.white};
+  white-space: nowrap;
+
+  .date {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(250,248,243,0.6);
+  }
+
+  .name {
+    font-family: ${props => props.theme.fonts.serif};
+    font-size: 1.2rem;
+    font-style: italic;
+  }
+
+  .sep {
+    font-family: ${props => props.theme.fonts.mono};
+    color: ${props => props.theme.colors.accent};
+  }
+
+  &:hover .name { color: ${props => props.theme.colors.accent}; }
+`;
+
+const DiningGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const DiningCard = styled(Link)`
+  display: block;
+  background: ${props => props.theme.colors.white};
+  border: 1px solid ${props => props.theme.colors.borderLight};
+  overflow: hidden;
+  transition: all ${props => props.theme.transitions.normal} ${props => props.theme.transitions.cubic};
+
+  .media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s ${props => props.theme.transitions.cubic};
+    }
+
+    span {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: ${props => props.theme.colors.text};
+      color: ${props => props.theme.colors.white};
+      font-family: ${props => props.theme.fonts.mono};
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.8rem;
+    }
+  }
+
+  .body {
+    padding: 1.5rem 1.75rem 1.75rem;
+
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .cuisine {
+      font-family: ${props => props.theme.fonts.mono};
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: ${props => props.theme.colors.accentDeep};
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      font-size: ${props => props.theme.fontSizes.sm};
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: ${props => props.theme.shadows.lg};
+    .media img { transform: scale(1.06); }
+  }
+`;
+
+const MoveStrip = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: ${props => props.theme.colors.border};
+  border: 1px solid ${props => props.theme.colors.border};
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const MoveCard = styled(Link)`
+  background: ${props => props.theme.colors.cream};
+  padding: 2rem;
+  text-align: center;
+  transition: all ${props => props.theme.transitions.normal};
+
+  .ico {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    border: 1px solid ${props => props.theme.colors.accent};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${props => props.theme.colors.identity};
+    transition: all ${props => props.theme.transitions.normal};
+  }
+
+  h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: ${props => props.theme.fontSizes.sm};
+  }
+
+  .price {
+    margin-top: 0.9rem;
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 0.85rem;
+    color: ${props => props.theme.colors.identity};
+  }
+
+  &:hover {
+    background: ${props => props.theme.colors.white};
+    transform: translateY(-3px);
+
+    .ico { background: ${props => props.theme.colors.identity}; color: ${props => props.theme.colors.white}; }
+  }
+`;
+
+const AiPanel = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const AiWindow = styled.div`
+  background: rgba(250, 248, 243, 0.04);
+  border: 1px solid rgba(203, 184, 157, 0.25);
+  border-radius: ${props => props.theme.borderRadius.md};
+  overflow: hidden;
+  box-shadow: ${props => props.theme.shadows.xl};
+`;
+
+const AiWindowBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid rgba(203, 184, 157, 0.2);
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: ${props => props.theme.colors.accentDeep};
+    opacity: 0.7;
+  }
+
+  span {
+    flex: 1;
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(250, 248, 243, 0.5);
+    text-transform: uppercase;
+    text-align: center;
+  }
+`;
+
+const AiBody = styled.div`
+  padding: 2rem;
+
+  .q {
+    font-family: ${props => props.theme.fonts.serif};
+    font-size: 1.25rem;
+    font-style: italic;
+    color: ${props => props.theme.colors.white};
+    margin-bottom: 1.5rem;
+  }
+
+  .trip {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+`;
+
+const TripLine = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .d {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: ${props => props.theme.colors.accent};
+    width: 2.4rem;
+    flex-shrink: 0;
+  }
+
+  .line {
+    flex: 1;
+    height: 1px;
+    background: rgba(203, 184, 157, 0.3);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: -2px;
+      top: -3px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: ${props => props.theme.colors.accent};
+    }
+  }
+
+  .t {
+    flex: 3;
+    font-size: 0.95rem;
+    color: rgba(250, 248, 243, 0.85);
+  }
+
+  .c {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    color: rgba(250, 248, 243, 0.45);
+  }
+`;
+
+const GuidesRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const GuideCard = styled(Link)`
+  display: block;
+  border: 1px solid ${props => props.theme.colors.borderLight};
+  background: ${props => props.theme.colors.cream};
+  padding: 2.25rem;
+  transition: all ${props => props.theme.transitions.normal} ${props => props.theme.transitions.cubic};
+
+  .cat {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: ${props => props.theme.colors.accentDeep};
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  h3 {
+    font-size: 1.55rem;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    font-size: ${props => props.theme.fontSizes.sm};
+    margin-bottom: 1.5rem;
+  }
+
+  .read {
+    font-family: ${props => props.theme.fonts.mono};
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: ${props => props.theme.colors.identity};
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap ${props => props.theme.transitions.fast};
+  }
+
+  &:hover {
+    background: ${props => props.theme.colors.white};
+    transform: translateY(-4px);
+    box-shadow: ${props => props.theme.shadows.lg};
+    border-color: ${props => props.theme.colors.accent};
+
+    .read { gap: 1rem; }
+    h3 { color: ${props => props.theme.colors.identity}; }
+  }
+`;
+
+const FinalCta = styled(Section)`
+  background: ${props => props.theme.colors.backgroundDark};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(203,184,157,0.4), transparent);
+  }
+`;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const PILLARS = [
+  { to: '/visit', label: 'Visit', desc: 'Weather, maps, visas, emergencies, and practical intel for arriving well.' },
+  { to: '/stays', label: 'Stay', desc: 'Hotels, lodges, resorts, guest houses, safari camps, and villas.' },
+  { to: '/experiences', label: 'Experience', desc: 'Activities across the falls, the gorge, the river, and the bush.' },
+  { to: '/dining', label: 'Eat', desc: 'Restaurants from riverside fine dining to the Boma drum show.' },
+  { to: '/transport', label: 'Move', desc: 'Airport transfers, car hire, private drivers, and shared shuttles.' },
+  { to: '/events', label: 'Events', desc: 'Festivals, conferences, concerts, and cultural calendars.' },
+  { to: '/business', label: 'Business', desc: 'Claim listings, manage availability, and view analytics.' },
+  { to: '/discover', label: 'Discover', desc: 'History, seasons, wildlife, culture, and neighbourhoods.' },
 ];
 
-const FEATURED_STAYS = [
-  { id: 'acc-1', slug: 'the-victoria-falls-hotel', category: 'Heritage Hotel', name: 'The Victoria Falls Hotel', rating: 9.1, reviews: 251, price: 577, image: 'https://www.victoriafallshotel.com/data/files/1.jpg' },
-  { id: 'acc-2', slug: 'victoria-falls-safari-lodge', category: 'Safari Lodge', name: 'Victoria Falls Safari Lodge', rating: 9.0, reviews: 432, price: 418, image: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80' },
-  { id: 'acc-3', slug: 'anantara-stanley-livingstone', category: 'Boutique Hotel', name: 'Anantara Stanley & Livingstone', rating: 9.2, reviews: 24, price: 400, image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80' },
-  { id: 'acc-7', slug: 'ilala-lodge-hotel', category: 'Lodge', name: 'Ilala Lodge Hotel', rating: 8.8, reviews: 2200, price: 150, image: 'https://www.ilalalodge.com/wp-content/uploads/2022/08/Ilala-Lodge-Hotel-and-pools-ILH.jpeg' },
+const TRIP_LINES = [
+  { d: 'DAY 1', t: 'Arrive — private airport transfer', c: 'Move' },
+  { d: 'DAY 2', t: 'Sunset Zambezi cruise + Boma drum dinner', c: 'Experience / Eat' },
+  { d: 'DAY 3', t: 'Flight of Angels helicopter + Falls walk', c: 'Experience' },
+  { d: 'DAY 4', t: 'Big Five safari in Chobe National Park', c: 'Experience' },
+  { d: 'DAY 5', t: 'Departure — shuttle to the airport', c: 'Move' },
 ];
 
-const BANNER_SLIDES = [
-  { title: 'Discover Victoria Falls', desc: 'Explore the Smoke That Thunders — from misty rainforests to the legendary Victoria Falls Bridge.', image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80', to: '/discover', icon: 'compass' },
-  { title: 'Curated Experiences', desc: 'Helicopter flights, sunset cruises, white-water rafting, and bush walks with world-class guides.', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600&q=80', to: '/experiences', icon: 'sun' },
-  { title: 'World-Class Dining', desc: 'Bush dinners under the stars, fine dining at historic hotels, and authentic local cuisine.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', to: '/dining', icon: 'dining' },
-  { title: 'Seamless Transport', desc: 'Airport transfers, private drivers, and guided transfers across Victoria Falls.', image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1600&q=80', to: '/transport', icon: 'car' },
-  { title: 'Unforgettable Events', desc: 'Live entertainment, cultural festivals, and exclusive private events throughout the year.', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&q=80', to: '/events', icon: 'ticket' },
-  { title: 'Build Your Journey', desc: 'AI-powered trip planning — tell us your style and we\'ll craft the perfect Victoria Falls itinerary.', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80', to: '/plan', icon: 'mapPin' },
+const STATS = [
+  { v: '35°C', l: 'Today in Victoria Falls', live: true },
+  { v: '12', l: 'Events on this month', live: false },
+  { v: '9.4', l: 'Avg. visitor rating', live: false },
+  { v: '1.7km', l: 'The width of the falls', live: false },
 ];
 
-const MAP_PINS = [
-  { id: 'falls', name: 'Victoria Falls', x: '35%', y: '42%', category: 'Natural Wonder', desc: 'The main falls — 1.7km of cascading water, 108m drop. The Smoke That Thunders.', rating: null, price: null, to: '/discover' },
-  { id: 'hotel', name: 'The Victoria Falls Hotel', x: '52%', y: '35%', category: 'Heritage Hotel', desc: 'Iconic Edwardian elegance since 1904. Views of the bridge and gorge.', rating: '★ 9.1 · 251 reviews', price: 'From $577 / night', to: '/stays/the-victoria-falls-hotel' },
-  { id: 'safari', name: 'Victoria Falls Safari Lodge', x: '68%', y: '55%', category: 'Safari Lodge', desc: 'Perched on a ridge overlooking a wildlife waterhole. 500 acres of wilderness.', rating: '★ 9.0 · 432 reviews', price: 'From $418 / night', to: '/stays/victoria-falls-safari-lodge' },
-  { id: 'bridge', name: 'Victoria Falls Bridge', x: '40%', y: '55%', category: 'Landmark', desc: 'Bungee, zip-line, and bridge tours with canyon views. Built in 1905.', rating: null, price: null, to: '/experiences' },
-  { id: 'town', name: 'Victoria Falls Town', x: '55%', y: '48%', category: 'Town Centre', desc: 'Shops, restaurants, markets, and the gateway to all activities.', rating: null, price: null, to: '/dining' },
-  { id: 'national-park', name: 'Zambezi National Park', x: '25%', y: '30%', category: 'National Park', desc: 'Wildlife-rich park stretching along the Zambezi. Big game, birdlife, and river cruises.', rating: null, price: null, to: '/experiences' },
-];
-
-const GUIDE_DATA = [
-  { title: 'First Time in Victoria Falls', slug: 'first-time', excerpt: 'Everything you need to know for your first visit to the Smoke That Thunders.', image: 'https://images.unsplash.com/photo-1590003351425-4e1c93b8e89a?w=800&q=80' },
-  { title: '48 Hours in Victoria Falls', slug: '48-hours', excerpt: 'A perfectly packed two-day itinerary for the time-conscious traveler.', image: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800&q=80' },
-  { title: 'Best Sunset Spots', slug: 'best-sunset-spots', excerpt: 'Where to watch the most spectacular sunsets over the Zambezi.', image: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&q=80' },
-  { title: 'Family Adventure Guide', slug: 'family-adventure', excerpt: 'The best family-friendly activities and stays for your Victoria Falls trip.', image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80' },
-];
-
-const PARTNER_DATA = [
-  { name: 'Wilderness Safaris', icon: 'mountain' },
-  { name: 'Anantara Hotels', icon: 'dining' },
-  { name: 'Shearwater Adventures', icon: 'compass' },
-  { name: 'The Victoria Falls Hotel', icon: 'sun' },
-  { name: 'Ilala Lodge', icon: 'pool' },
-  { name: 'Zimbabwe Tourism Authority', icon: 'mapPin' },
-];
-
-/* ─── COMPONENT ─── */
-const HERO_VIDEOS = [
-  'https://www.pexels.com/video/2421621/download/',
-  'https://www.pexels.com/video/37711945/download/',
+const QUICK = [
+  { label: '5 days · family · $3,000', to: '/plan' },
+  { label: 'What\'s on this weekend?', to: '/events' },
+  { label: 'Where should I stay?', to: '/stays' },
 ];
 
 export default function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [activePin, setActivePin] = useState(MAP_PINS[0]);
-  const [currentVideo, setCurrentVideo] = useState(0);
-  const videoRef = useRef(null);
+  const [prompt, setPrompt] = useState(0);
+  const featuredStays = accommodations.filter(a => a.featured).slice(0, 3);
+  const featuredExps = experiences.filter(e => e.featured).slice(0, 4);
+  const featuredDining = restaurants.filter(r => r.featured).slice(0, 3);
+  const upcomingEvents = events.slice(0, 8);
+  const moveServices = transportServices.slice(0, 4);
+  const featuredGuides = guides.slice(0, 3);
 
-  const nextSlide = useCallback(() => {
-    setCurrentSlide(prev => (prev + 1) % BANNER_SLIDES.length);
+  useEffect(() => {
+    const t = setInterval(() => setPrompt(p => (p + 1) % QUICK.length), 4000);
+    return () => clearInterval(t);
   }, []);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide(prev => (prev - 1 + BANNER_SLIDES.length) % BANNER_SLIDES.length);
-  }, []);
-
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = setInterval(nextSlide, 5000);
-    return () => clearInterval(timer);
-  }, [isPaused, nextSlide]);
-
-  // Video cycling effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentVideo(prev => (prev + 1) % HERO_VIDEOS.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Play video when currentVideo changes
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.load();
-      videoRef.current.play().catch(() => {});
-    }
-  }, [currentVideo]);
 
   return (
     <>
-      {/* ─── 1. HERO ─── */}
       <Hero>
-        <VideoManager>
-          <HeroVideo
-            key={currentVideo}
-            ref={videoRef}
-            src={HERO_VIDEOS[currentVideo]}
-            muted
-            loop={false}
-            playsInline
-          />
-        </VideoManager>
-        <HeroContent>
-          <HeroLabel initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.8,delay:0.3}}>
-            Victoria Falls, Zimbabwe
-          </HeroLabel>
-          <HeroTitle initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.9,delay:0.5}}>
-            One Platform.<br />Every Experience.
-          </HeroTitle>
-          <HeroSub initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.9,delay:0.8}}>
-            Discover, book, and experience the world's greatest natural wonder — all from a single, beautifully crafted platform.
-          </HeroSub>
-          <HeroCTAs initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.8,delay:1.1}}>
-            <BtnPrimary to="/discover">Begin Your Journey</BtnPrimary>
-            <BtnOutline to="/plan">Plan My Trip</BtnOutline>
-          </HeroCTAs>
-        </HeroContent>
-        <HeroScroll initial={{opacity:0}} animate={{opacity:1}} transition={{delay:1.8,duration:0.8}}>
-          Scroll
-          <ScrollLine />
-        </HeroScroll>
+        <HeroBg><img src={HERO_IMG} alt="Victoria Falls" /></HeroBg>
+        <HeroInner>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <HeroSystem>
+              <span className="sys-dot" />
+              <HeroSysText>VF-ONE // Digital Operating System</HeroSysText>
+            </HeroSystem>
+            <HeroTitle>
+              One destination.<br />One <em>system.</em>
+            </HeroTitle>
+            <HeroSub>
+              Victoria Falls — where to stay, what to do, what's on, how to move, and who to call.
+              The entire destination, wired into a single digital front door.
+            </HeroSub>
+<CommandBar>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              <span className="cmd-text">"{QUICK[prompt].label}"</span>
+              <CommandBtn
+                to={QUICK[prompt].to}
+                onClick={() => setPrompt(Math.floor(Math.random() * QUICK.length))}
+              >
+                Build My Journey
+              </CommandBtn>
+            </CommandBar>
+            <QuickChips>
+              {QUICK.map((q, i) => (
+                <Link key={q.label} to={q.to} onClick={() => i !== 0 && setPrompt(i)}>{q.label}</Link>
+              ))}
+            </QuickChips>
+          </motion.div>
+        </HeroInner>
+
+        <HeroStats>
+          <HeroStatsInner>
+            {STATS.map(s => (
+              <HStat key={s.l}>
+                <div className="v">{s.live && <span className="dot" />}{s.v}</div>
+                <div className="l">{s.l}</div>
+              </HStat>
+            ))}
+          </HeroStatsInner>
+        </HeroStats>
       </Hero>
 
-      {/* ─── 2. WHY VICTORIA FALLS ─── */}
-      <WhySection>
-        <WhyGrid>
-          <WhyContent>
-            <WhyLabel>Why Victoria Falls</WhyLabel>
-            <WhyTitle>A Wonder of the World,<br />A Playground for the Soul</WhyTitle>
-            <WhyDesc>
-              Victoria Falls is not just a destination — it's an experience that transforms you.
-              Where the mighty Zambezi plunges into the Batoka Gorge, nature reveals its most dramatic spectacle.
-              This is where luxury meets wilderness.
-            </WhyDesc>
-            <WhyList>
-              {WHY_FEATURES.map((f, i) => (
-                <WhyItem key={i} initial={{opacity:0,x:20}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.5,delay:i*0.1}}>
-                  <WhyItemIcon><Icon name={f.icon} size={20} /></WhyItemIcon>
-                  <div>
-                    <WhyItemTitle>{f.title}</WhyItemTitle>
-                    <WhyItemText>{f.text}</WhyItemText>
+      <SystemSection>
+        <Container>
+          <SectionHeading $center>
+            <Eyebrow className="eyebrow">System Modules</Eyebrow>
+            <h2>Eight modules. One destination.</h2>
+            <p>VicFalls One is not a booking website. It is the operating system for the world's greatest curtain of falling water — every layer of the destination, wired together.</p>
+          </SectionHeading>
+          <PillarGrid>
+            {PILLARS.map((p, i) => (
+              <Pillar key={p.label} to={p.to}>
+                <span className="num">MODULE_{String(i + 1).padStart(2, '0')}</span>
+                <h3>{p.label}</h3>
+                <p>{p.desc}</p>
+              </Pillar>
+            ))}
+          </PillarGrid>
+        </Container>
+      </SystemSection>
+
+      <Section $bg={props => props.theme.colors.cream}>
+        <Container>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+            <SectionHeading style={{ marginBottom: 0 }}>
+              <Eyebrow className="eyebrow">The Stay Layer</Eyebrow>
+              <h2>Signature stays</h2>
+            </SectionHeading>
+            <Btn to="/stays" $variant="ghost-dark" $size="sm">View all stays →</Btn>
+          </div>
+          <FeaturedRow>
+            {featuredStays.map((s, i) => (
+              <motion.div key={s.id} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}>
+                <StayCard to={`/stays/${s.slug}`}>
+                  <img src={s.images[0]} alt={s.name} loading="lazy" />
+                  <div className="shade" />
+                  <div className="content">
+                    <span className="tag">{String(i + 1).padStart(2, '0')} — {s.category}</span>
+                    <h3>{s.name}</h3>
+                    <div className="meta">
+                      <span>{s.location}</span>
+                      <span>From ${s.priceFrom}/night</span>
+                    </div>
                   </div>
-                </WhyItem>
-              ))}
-            </WhyList>
-          </WhyContent>
-          <WhyImage>
-            <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&q=85" alt="Victoria Falls" />
-          </WhyImage>
-        </WhyGrid>
-      </WhySection>
+                </StayCard>
+              </motion.div>
+            ))}
+          </FeaturedRow>
+        </Container>
+      </Section>
 
-      {/* ─── 3. HANDPICKED STAYS ─── */}
-      <FullBleed>
-        <SectionHeader style={{padding:'0 2rem'}}>
-          <SectionLabel>Exceptional Places to Stay</SectionLabel>
-          <Divider />
-          <SectionTitle>Handpicked Properties</SectionTitle>
-          <SectionDesc>Where you rest matters. These are the stays we'd choose ourselves.</SectionDesc>
-        </SectionHeader>
-        <StaysScroll>
-          {FEATURED_STAYS.map(s => (
-            <StayCard key={s.id} to={`/stays/${s.slug}`}>
-              <StayImg className="stayimg">
-                <img src={s.image} alt={s.name} loading="lazy" />
-                <StayBadge>{s.category}</StayBadge>
-              </StayImg>
-              <StayBody>
-                <StayCategory>{s.category}</StayCategory>
-                <StayName>{s.name}</StayName>
-                <StayMeta>
-                  <StayRating>★ {s.rating}</StayRating>
-                  <span>· {s.reviews.toLocaleString()} reviews</span>
-                </StayMeta>
-                <StayPriceRow>
-                  <StayPrice>From <span>${s.price}</span> / night</StayPrice>
-                  <StayCTA>Explore Stay →</StayCTA>
-                </StayPriceRow>
-              </StayBody>
-            </StayCard>
-          ))}
-        </StaysScroll>
-      </FullBleed>
-
-      {/* ─── 4. VISITOR PLATFORM BANNER ─── */}
-      <BannerSection
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {BANNER_SLIDES.map((slide, i) => (
-          <BannerSlide key={i} $active={i === currentSlide}>
-            <BannerImg $active={i === currentSlide}>
-              <img src={slide.image} alt={slide.title} />
-            </BannerImg>
-            <BannerOverlay />
-          </BannerSlide>
-        ))}
-
-        <BannerContent>
-          <BannerTag key={`tag-${currentSlide}`} initial={{opacity:0,x:-20}} animate={{opacity:1,x:0}} transition={{duration:0.6,delay:0.2}}>
-            Your Victoria Falls Companion
-          </BannerTag>
-          <BannerTitle key={`title-${currentSlide}`} initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.3}}>
-            {BANNER_SLIDES[currentSlide].title}
-          </BannerTitle>
-          <BannerDesc key={`desc-${currentSlide}`} initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.6,delay:0.5}}>
-            {BANNER_SLIDES[currentSlide].desc}
-          </BannerDesc>
-          <BannerCTA key={`cta-${currentSlide}`} to={BANNER_SLIDES[currentSlide].to} initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} transition={{duration:0.5,delay:0.7}}>
-            Explore <Icon name="arrow" size={16} />
-          </BannerCTA>
-        </BannerContent>
-
-        <BannerCounter>
-          {String(currentSlide + 1).padStart(2, '0')} / {String(BANNER_SLIDES.length).padStart(2, '0')}
-        </BannerCounter>
-
-        <BannerArrow $left onClick={prevSlide}>&#8592;</BannerArrow>
-        <BannerArrow onClick={nextSlide}>&#8594;</BannerArrow>
-
-        <PlatformIconStrip>
-          {BANNER_SLIDES.map((slide, i) => (
-            <PlatformIconItem key={i} to={slide.to} $active={i === currentSlide}>
-              <Icon name={slide.icon} size={16} />
-              {slide.title.split(' ').pop()}
-            </PlatformIconItem>
-          ))}
-        </PlatformIconStrip>
-
-        <BannerControls>
-          {BANNER_SLIDES.map((_, i) => (
-            <BannerDot key={i} $active={i === currentSlide} onClick={() => setCurrentSlide(i)} />
-          ))}
-        </BannerControls>
-      </BannerSection>
-
-      {/* ─── 5. SIGNATURE JOURNEYS ─── */}
-      <FullBleed>
-        <SectionHeader style={{padding:'0 2rem'}}>
-          <SectionLabel>Signature Journeys</SectionLabel>
-          <Divider />
-          <SectionTitle>Trips You'll Dream About</SectionTitle>
-          <SectionDesc>Curated multi-day experiences — each one a complete Victoria Falls story.</SectionDesc>
-        </SectionHeader>
-        <JourneyScroll>
-          {signatureJourneys.map(j => (
-            <JourneyCard key={j.id} to="/plan">
-              <JImg className="jimg"><img src={j.images[0]} alt={j.name} loading="lazy" /></JImg>
-              <JOverlay className="joverlay">
-                <JTag>{j.duration}</JTag>
-                <JName>{j.name}</JName>
-                <JMeta>
-                  <JPrice>From ${j.priceFrom.toLocaleString()}</JPrice>
-                  <span>{j.priceUnit}</span>
-                </JMeta>
-              </JOverlay>
-            </JourneyCard>
-          ))}
-        </JourneyScroll>
-      </FullBleed>
-
-      {/* ─── 6. INTERACTIVE MAP ─── */}
-      <MapSection>
-        <MapInner>
-          <SectionHeader>
-            <SectionLabel>Explore the Region</SectionLabel>
-            <Divider />
-            <SectionTitle>Interactive Map</SectionTitle>
-            <SectionDesc>Discover key locations across Victoria Falls and the surrounding area.</SectionDesc>
-          </SectionHeader>
-          <MapLayout>
-            <MapCanvas>
-              <MapSvg>
-                <svg viewBox="0 0 600 450" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'100%'}}>
-                  <rect width="600" height="450" fill="#1F3A32"/>
-                  <path d="M0 200 Q80 180 150 220 Q220 260 300 240 Q380 220 450 250 Q520 280 600 260 L600 450 L0 450Z" fill="#2A4F43" opacity="0.5"/>
-                  <path d="M0 280 Q100 260 200 290 Q300 320 400 290 Q500 260 600 280 L600 450 L0 450Z" fill="#1F3A32" opacity="0.3"/>
-                  <path d="M280 100 Q290 150 285 200 Q280 250 290 300 Q300 350 295 400" stroke="rgba(216,195,165,0.3)" strokeWidth="3" strokeDasharray="8 4"/>
-                  <path d="M100 150 Q150 180 200 170 Q250 160 300 180 Q350 200 400 190 Q450 180 500 200" stroke="rgba(216,195,165,0.15)" strokeWidth="2"/>
-                  <circle cx="210" cy="190" r="40" fill="rgba(216,195,165,0.08)" stroke="rgba(216,195,165,0.15)" strokeWidth="1"/>
-                  <circle cx="410" cy="250" r="25" fill="rgba(216,195,165,0.06)" stroke="rgba(216,195,165,0.1)" strokeWidth="1"/>
-                  <text x="300" y="20" textAnchor="middle" fill="rgba(216,195,165,0.25)" fontSize="10" fontFamily="Inter" letterSpacing="0.15em">ZAMBEZI RIVER</text>
-                  <text x="150" y="380" textAnchor="middle" fill="rgba(216,195,165,0.15)" fontSize="9" fontFamily="Inter" letterSpacing="0.1em">ZAMBEZI NATIONAL PARK</text>
-                </svg>
-              </MapSvg>
-              {MAP_PINS.map(pin => (
-                <MapPin
-                  key={pin.id}
-                  style={{ left: pin.x, top: pin.y }}
-                  $active={activePin.id === pin.id}
-                  onClick={() => setActivePin(pin)}
-                >
-                  <MapPinLabel $active={activePin.id === pin.id}>{pin.name}</MapPinLabel>
-                </MapPin>
-              ))}
-            </MapCanvas>
-            <div>
-              <AnimatePresence mode="wait">
-                <MapInfo key={activePin.id} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.3}}>
-                  <MapInfoCategory>{activePin.category}</MapInfoCategory>
-                  <MapInfoName>{activePin.name}</MapInfoName>
-                  {activePin.rating && <MapInfoRating>{activePin.rating}</MapInfoRating>}
-                  <MapInfoDesc>{activePin.desc}</MapInfoDesc>
-                  {activePin.price && <MapInfoPrice><span>{activePin.price}</span></MapInfoPrice>}
-                  <MapInfoBtn to={activePin.to}>Explore <Icon name="arrow" size={14} /></MapInfoBtn>
-                </MapInfo>
-              </AnimatePresence>
-              <MapPinsList>
-                {MAP_PINS.map(pin => (
-                  <MapPinBtn key={pin.id} $active={activePin.id === pin.id} onClick={() => setActivePin(pin)}>
-                    <PinDot $active={activePin.id === pin.id} />
-                    {pin.name}
-                  </MapPinBtn>
-                ))}
-              </MapPinsList>
-            </div>
-          </MapLayout>
-        </MapInner>
-      </MapSection>
-
-      {/* ─── 7. GUIDES & STORIES ─── */}
       <Section>
-        <SectionHeader>
-          <SectionLabel>Guides & Stories</SectionLabel>
-          <Divider />
-          <SectionTitle>Plan Your Perfect Trip</SectionTitle>
-          <SectionDesc>Insider knowledge from the heart of Victoria Falls.</SectionDesc>
-        </SectionHeader>
-        <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:'-50px'}} variants={stagger}>
-          <GuidesGrid>
-            {GUIDE_DATA.map((g, i) => (
-              <motion.div key={i} variants={fadeUp}>
+        <Container>
+          <Split>
+            <SplitMedia>
+              <motion.img
+                src={experiences[0].images[0]}
+                alt={experiences[0].name}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+                variants={fadeUp}
+              />
+            </SplitMedia>
+            <div>
+              <SectionHeading>
+                <Eyebrow className="eyebrow">The Experience Layer</Eyebrow>
+                <h2>Choose your adventure</h2>
+                <p>Helicopters over the falls, elephants at the waterhole, rapids in the gorge. Every experience, rated and ready to book.</p>
+              </SectionHeading>
+              <ExpList>
+                {featuredExps.map((e, i) => (
+                  <ExpItem key={e.id} to={`/experiences/${e.slug}`}>
+                    <span className="idx">{String(i + 1).padStart(2, '0')}</span>
+                    <div className="body">
+                      <h4>{e.name}</h4>
+                      <p>
+                        <span>{e.duration}</span>
+                        <span>{e.type}</span>
+                        <span>★ {e.rating}</span>
+                      </p>
+                    </div>
+                    <div className="price">${e.priceFrom}</div>
+                  </ExpItem>
+                ))}
+              </ExpList>
+              <Btn to="/experiences" $variant="solid" style={{ marginTop: '2rem' }}>Explore all experiences</Btn>
+            </div>
+          </Split>
+        </Container>
+      </Section>
+
+      <DarkSection>
+        <Container>
+          <SectionHeading $center>
+            <Eyebrow className="eyebrow" $light>What's On</Eyebrow>
+            <h2 style={{ color: 'white' }}>The pulse of Victoria Falls</h2>
+            <p style={{ color: 'rgba(250,248,243,0.7)' }}>Festivals, conferences, concerts, and cultural evenings — everything happening while you're here.</p>
+          </SectionHeading>
+        </Container>
+      </DarkSection>
+
+      <EventTicker>
+        <TickerTrack>
+          {[...upcomingEvents, ...upcomingEvents].map((e, i) => (
+            <TickerItem key={`${e.id}-${i}`} to="/events">
+              <span className="date">{e.date}</span>
+              <span className="name">{e.name}</span>
+              <span className="sep">·</span>
+            </TickerItem>
+          ))}
+        </TickerTrack>
+      </EventTicker>
+
+      <Section>
+        <Container>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+            <SectionHeading style={{ marginBottom: 0 }}>
+              <Eyebrow className="eyebrow">The Eat Layer</Eyebrow>
+              <h2>Dine around the falls</h2>
+            </SectionHeading>
+            <Btn to="/dining" $variant="ghost-dark" $size="sm">View all dining →</Btn>
+          </div>
+          <DiningGrid>
+            {featuredDining.map((r, i) => (
+              <motion.div key={r.id} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}>
+                <DiningCard to={`/dining/${r.slug}`}>
+                  <div className="media">
+                    <img src={r.images[0]} alt={r.name} loading="lazy" />
+                    <span>{r.category}</span>
+                  </div>
+                  <div className="body">
+                    <h3>{r.name}</h3>
+                    <div className="cuisine">{r.cuisine}</div>
+                    <p>{r.description}</p>
+                    <p style={{ marginTop: '1rem' }}>
+                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#46584A', letterSpacing: '0.05em' }}>
+                        ★ {r.rating} · from ${r.pricePerPerson}/person
+                      </span>
+                    </p>
+                  </div>
+                </DiningCard>
+              </motion.div>
+            ))}
+          </DiningGrid>
+        </Container>
+      </Section>
+
+      <Section $bg={props => props.theme.colors.cream}>
+        <Container>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+            <SectionHeading style={{ marginBottom: 0 }}>
+              <Eyebrow className="eyebrow">The Move Layer</Eyebrow>
+              <h2>Getting around, solved</h2>
+            </SectionHeading>
+            <Btn to="/transport" $variant="ghost-dark" $size="sm">View all transport →</Btn>
+          </div>
+          <MoveStrip>
+            {moveServices.map((m, i) => (
+              <MoveCard key={m.id} to="/transport">
+                <div className="ico">
+                  <Icon name={['plane', 'building', 'car', 'bus'][i]} size={22} />
+                </div>
+                <h4>{m.name}</h4>
+                <p>{m.vehicleType} · {m.capacity}</p>
+                <div className="price">From ${m.priceFrom} {m.priceUnit}</div>
+              </MoveCard>
+            ))}
+          </MoveStrip>
+        </Container>
+      </Section>
+
+      <DarkSection>
+        <Container>
+          <AiPanel>
+            <div>
+              <SectionHeading>
+                <Eyebrow className="eyebrow" $light>The AI Layer</Eyebrow>
+                <h2 style={{ color: 'white' }}>Describe your trip. We build it.</h2>
+                <p style={{ color: 'rgba(250,248,243,0.7)' }}>
+                  No more searching hotels, then tours, then restaurants, then transfers.
+                  Tell the concierge who you are, and VicFalls One assembles the whole journey
+                  from across the ecosystem — in one pass.
+                </p>
+                <Btn to="/plan" $variant="gold" style={{ marginTop: '0.5rem' }}>Open the AI Concierge</Btn>
+              </SectionHeading>
+            </div>
+            <AiWindow>
+              <AiWindowBar>
+                <span className="dot" /><span>vc-one // itinerary-engine</span><span className="dot" />
+              </AiWindowBar>
+              <AiBody>
+                <div className="q">“I'm visiting for 5 days with my family and $3,000.”</div>
+                <div className="trip">
+                  {TRIP_LINES.map(line => (
+                    <TripLine key={line.d}>
+                      <span className="d">{line.d}</span>
+                      <span className="line" />
+                      <span className="t">{line.t}</span>
+                      <span className="c">{line.c}</span>
+                    </TripLine>
+                  ))}
+                </div>
+              </AiBody>
+            </AiWindow>
+          </AiPanel>
+        </Container>
+      </DarkSection>
+
+      <Section>
+        <Container>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+            <SectionHeading style={{ marginBottom: 0 }}>
+              <Eyebrow className="eyebrow">Field Notes</Eyebrow>
+              <h2>Guides from the destination</h2>
+            </SectionHeading>
+            <Btn to="/journal" $variant="ghost-dark" $size="sm">All guides →</Btn>
+          </div>
+          <GuidesRow>
+            {featuredGuides.map((g, i) => (
+              <motion.div key={g.id} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}>
                 <GuideCard to={`/journal/${g.slug}`}>
-                  <GCardImg className="gimg"><img src={g.image} alt={g.title} loading="lazy" /></GCardImg>
-                  <GCardBody>
-                    <div className="cat">Travel Guide</div>
-                    <h3>{g.title}</h3>
-                    <p>{g.excerpt}</p>
-                  </GCardBody>
+                  <span className="cat">{g.category}</span>
+                  <h3>{g.title}</h3>
+                  <p>{g.excerpt}</p>
+                  <span className="read">{g.readTime} →</span>
                 </GuideCard>
               </motion.div>
             ))}
-          </GuidesGrid>
-        </motion.div>
+          </GuidesRow>
+        </Container>
       </Section>
 
-      {/* ─── 8. TRUSTED BY ─── */}
-      <PartnersSection>
-        <PartnersLabel>Trusted by Leading Operators</PartnersLabel>
-        <PartnersGrid>
-          {PARTNER_DATA.map((p, i) => (
-            <PartnerLogo key={i}>
-              <Icon name={p.icon} size={22} />
-              {p.name}
-            </PartnerLogo>
-          ))}
-        </PartnersGrid>
-      </PartnersSection>
-
-      {/* ─── 9. FINAL CTA ─── */}
-      <FinalCTA>
-        <FinalCTABg>
-          <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1800&q=85" alt="Victoria Falls" />
-        </FinalCTABg>
-        <FinalCTAOverlay />
-        <FinalCTAContent>
-          <FinalCTATitle>Your Victoria Falls Journey<br/>Starts Here</FinalCTATitle>
-          <FinalCTAButtons>
-            <BtnPrimary to="/plan">Plan My Trip</BtnPrimary>
-            <BtnOutline to="/discover">Explore Victoria Falls</BtnOutline>
-          </FinalCTAButtons>
-        </FinalCTAContent>
-      </FinalCTA>
+      <FinalCta>
+        <Container>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <Eyebrow className="eyebrow" $light>The Big VicFalls One</Eyebrow>
+            <h2 style={{ color: 'white', fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', maxWidth: 800, margin: '1rem auto 1.25rem' }}>
+              If Victoria Falls had one official digital platform, this is it.
+            </h2>
+            <p style={{ color: 'rgba(250,248,243,0.65)', maxWidth: 560, margin: '0 auto 2.5rem' }}>
+              Make VicFalls One your front door. Ask it anything — the destination answers as one system.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Btn to="/plan" $variant="gold">Plan Your Journey</Btn>
+              <Btn to="/discover" $variant="ghost-light">Discover the Destination</Btn>
+            </div>
+          </motion.div>
+        </Container>
+      </FinalCta>
     </>
   );
 }
