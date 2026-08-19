@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useSearchParams } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { PageHero, Container, Btn } from '../components/ui';
